@@ -12,5 +12,8 @@
     "flow"
   ],
   "author": "qtxz2000",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "fabric": "^2.4.4"
+  }
 }
