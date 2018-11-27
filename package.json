@@ -11,9 +11,24 @@
     "arrow",
     "flow"
   ],
-  "author": "qtxz2000",
+  "author": "qtxz2000 <atpick@163.com>",
   "license": "MIT",
   "dependencies": {
     "fabric": "^2.4.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lusase/lineDrawer"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "gulp-uglify": "^3.0.1",
+    "run-sequence": "^2.2.1"
   }
 }
