@@ -1,4 +1,11 @@
-const {fabric} = require('fabric')
+
+let fabric
+
+if (typeof require !== 'undefined') {
+  fabric = require('fabric').fabric
+} else {
+  fabric = window.fabric
+}
 
 const {Canvas, Circle, Path} = fabric
 fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center'
@@ -354,4 +361,11 @@ class LineDrawer {
   }
 }
 
-module.exports = LineDrawer
+if (typeof module !== 'undefined' && typeof exports !== 'undefined') {
+  module.exports = LineDrawer
+} else if(typeof define === 'function' && define.amd){
+  define([], function() { return LineDrawer })
+} else {
+  window.LineDrawer = LineDrawer
+}
+
