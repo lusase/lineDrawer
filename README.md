@@ -4,6 +4,6 @@
 
 ![imgage](https://github.com/lusase/lineDrawer/blob/master/doc/img1.png)
 
-![imgage](https://github.com/lusase/lineDrawer/blob/master/doc/img1.png)
+![imgage](https://github.com/lusase/lineDrawer/blob/master/doc/img2.png)
 
-![imgage](https://github.com/lusase/lineDrawer/blob/master/doc/img1.png)
+![imgage](https://github.com/lusase/lineDrawer/blob/master/doc/img3.png)
