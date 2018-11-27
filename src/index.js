@@ -55,6 +55,11 @@
       !editable && this.insertTooltip()
     }
 
+    dispose() {
+      this.canvas.dispose()
+      this.config.editable && window.removeEventListener('keydown', this.onKeydown)
+    }
+
     insertTooltip() {
       this.tooltip = document.createElement('div')
       this.tooltip.className = 'tooltip'
@@ -138,15 +143,24 @@
     }
 
     initListeners() {
-      const listeners = this.config.editable ? {
-        'object:moving': this.onObjectMoving.bind(this),
-        'mouse:down': this.onMouseDown.bind(this)
+      this.onObjectMoving = this.onObjectMoving.bind(this)
+      this.onMouseDown = this.onMouseDown.bind(this)
+      this.onMouseOver = this.onMouseOver.bind(this)
+      this.onMouseOut = this.onMouseOut.bind(this)
+      this.onMouseMove = this.onMouseMove.bind(this)
+      this.onKeydown = this.onKeydown.bind(this)
+
+      const canvasListeners = this.config.editable ? {
+        'object:moving': this.onObjectMoving,
+        'mouse:down': this.onMouseDown
       } : {
-        'mouse:over': this.onMouseOver.bind(this),
-        'mouse:out': this.onMouseOut.bind(this),
-        'mouse:move': this.onMouseMove.bind(this)
+        'mouse:over': this.onMouseOver,
+        'mouse:out': this.onMouseOut,
+        'mouse:move': this.onMouseMove
       }
-      this.canvas.on(listeners)
+      this.canvas.on(canvasListeners)
+
+      this.config.editable && window.addEventListener('keydown', this.onKeydown)
     }
 
     showToolTip() {
@@ -160,7 +174,15 @@
     isToolTipHidden() {
       return this.tooltip.style.visibility === 'hidden'
     }
-
+    onKeydown(e) {
+      // delete 键 删除当前线条
+      if (e.code === 'Delete') {
+        this.delCurrentLine()
+      // ctrl + z 删除当前点
+      } else if(e.code === 'KeyZ' && e.ctrlKey) {
+        this.delSelectedDot()
+      }
+    }
     onMouseMove(e) {
       if (this.config.editable) return
       if (!this.isToolTipHidden()) {
@@ -195,6 +217,7 @@
 
     onMouseDown(e) {
       if (!this.config.editable) return
+      if (e.e.ctrlKey) this.newEmptyLine()
 
       const target = e.target
       if (!target) {
@@ -214,17 +237,17 @@
 
     selectDot(dot) {
       if (this.lastSelectedDot) {
-        this.lastSelectedDot.set({fill: 'transparent', stroke: '#ddd', radius: 5})
+        this.lastSelectedDot.set({fill: 'transparent', stroke: '#ddd', radius: 5, selected: false})
       }
       this.lastSelectedDot = dot
-      dot.set({fill: '#fff0f0', stroke: '#0000ff', radius: 8})
+      dot.set({fill: '#fff0f0', stroke: '#0000ff', radius: 8, selected: true})
     }
 
     selectCurrentPath() {
       const {path} = this.getCurrentLine()
-      this.lastSelectedPath && this.lastSelectedPath.set({shadow: null})
+      this.lastSelectedPath && this.lastSelectedPath.set({shadow: null, selected: false})
       this.lastSelectedPath = path
-      path.set({shadow: this.pathShadow})
+      path.set({shadow: this.pathShadow, selected: true})
     }
 
     delSelectedDot() {
@@ -241,6 +264,7 @@
     delCurrentLine() {
       if (!this.config.editable) return
       const line = this.getCurrentLine()
+      if (!line.path.selected) return
       line.dots.forEach(dot => this.canvas.remove(dot))
       this.canvas.remove(line.path)
       delete this.lineMap[line.id]
