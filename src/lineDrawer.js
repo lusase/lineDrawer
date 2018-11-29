@@ -14,7 +14,57 @@
     return Array.from({length: 8}, () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substr(1)).join('')
   }
 
-  class LineDrawer {
+  class EventEmitter {
+    constructor() {
+      this._events = {}
+    }
+    on(type, listener) {
+      if ('function' !== typeof listener) {
+        throw new Error('method (on) only takes instances of Function')
+      }
+      if (!this._events[type]) {
+        this._events[type] = listener
+      } else {
+        this._events[type] = [this._events[type], listener]
+      }
+      return this
+    }
+    off(type, listener) {
+      if (!this._events[type]) return this
+      if (!listener) delete this._events[type]
+      const list = this._events[type]
+      if (Array.isArray(list)) {
+        const index = list.indexOf(listener)
+        if (index < 0) return this
+        list.splice(index, 1)
+        if (list.length = 0) delete this._events[type]
+      } else if(list === listener) {
+        delete this._events[type]
+      }
+      return this
+    }
+    emit(type, ...args) {
+      const handler = this._events[type]
+      if (!handler) return false
+      if (typeof handler === 'function') {
+        handler.call(this, ...args)
+        return true
+      } else if(Array.isArray(handler)) {
+        handler.forEach(item => {
+          item.call(this, ...args)
+        })
+        return true
+      } else {
+        return false
+      }
+    }
+    removeAllListeners() {
+      this._events = {}
+      return this
+    }
+  }
+
+  class LineDrawer extends EventEmitter{
     constructor(canvasId, {
       strokeWidth = 1,
       lineStroke = '#000',
@@ -24,6 +74,7 @@
       hasShadow = false,
       pathOpacity = 1
     } = {}, data) {
+      super()
       this.config = {
         strokeWidth,
         lineStroke,
@@ -120,11 +171,11 @@
       }
     }
 
-    savePaths() {
+    getLinesInfo() {
       return Object.values(this.lineMap).map(item => {
-          const strokeWidth = item.path.strokeWidth
+          if (!item.path) return {}
           return {
-            strokeWidth,
+            strokeWidth: item.path.strokeWidth,
             stroke: item.path.stroke,
             dots: item.dots.map(e => ([e.left / this.canvas.width, e.top / this.canvas.height]))
           }
@@ -138,6 +189,7 @@
 
     configCurrentPath(config) {
       const {path} = this.getCurrentLine()
+      if (!path) return
       path.set(config)
       this.renderLines()
     }
@@ -241,6 +293,7 @@
       }
       this.lastSelectedDot = dot
       dot.set({fill: '#fff0f0', stroke: '#0000ff', radius: 8, selected: true})
+      this.emit('focus.dot', dot)
     }
 
     selectCurrentPath() {
@@ -248,6 +301,7 @@
       this.lastSelectedPath && this.lastSelectedPath.set({shadow: null, selected: false})
       this.lastSelectedPath = path
       path.set({shadow: this.pathShadow, selected: true})
+      this.emit('focus.path', path)
     }
 
     delSelectedDot() {
@@ -258,6 +312,7 @@
         const [dot] = line.dots.splice(idx, 1)
         this.canvas.remove(dot)
         this.renderLines()
+        this.emit('del.dot', dot)
       }
     }
 

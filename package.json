@@ -1,8 +1,8 @@
 {
   "name": "linedrawer",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "lineDrawer base on fabric.js ",
-  "main": "dist/index.js",
+  "main": "dist/lineDrawer.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

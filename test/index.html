@@ -11,16 +11,16 @@
 <body onload="loadCanvas()">
 
 <div style="color: #fff">
-    <span style="background: aqua">aqua 水绿色</span>
+    <span style="background: aqua   ">aqua 水绿色</span>
     <span style="background: fuchsia">fuchsia 紫红色</span>
-    <span style="background: lime">lime 黄绿色</span>
-    <span style="background: maroon">maroon 红褐色</span>
-    <span style="background: navy">navy 藏青色</span>
-    <span style="background: olive">olive 黄褐色</span>
-    <span style="background: silver">silver 银色</span>
-    <span style="background: teal">teal 蓝绿色</span>
-    <span style="background: purple">purple 紫色</span>
-    <span style="background: orange">orange 橘黄色</span>
+    <span style="background: lime   ">lime 黄绿色</span>
+    <span style="background: maroon ">maroon 红褐色</span>
+    <span style="background: navy   ">navy 藏青色</span>
+    <span style="background: olive  ">olive 黄褐色</span>
+    <span style="background: silver ">silver 银色</span>
+    <span style="background: teal   ">teal 蓝绿色</span>
+    <span style="background: purple ">purple 紫色</span>
+    <span style="background: orange ">orange 橘黄色</span>
 </div>
 <div style="margin: 20px;width: 640px;height: 480px;background: #ccc;">
     <canvas id="c" width="640" height="480"></canvas>
@@ -40,10 +40,14 @@
     <button onclick="setLineWidth()">保存宽度</button>
 </div>
 
-<script src="../dist/index.js"></script>
+<script src="../dist/lineDrawer.js"></script>
 <script>
 
   const drawer = new LineDrawer('c', {lineStroke: '#fff', strokeWidth: 2, editable: true, pathOpacity: 0.5})
+
+  drawer.on('focus.path', function(path) {
+    console.log(path)
+  })
 
   function addNewLine() {
     drawer.newEmptyLine()
@@ -58,8 +62,8 @@
   }
 
   function saveCanvas() {
-    console.log(JSON.stringify(drawer.savePaths()))
-    localStorage.setItem('canvasLines', JSON.stringify(drawer.savePaths()))
+    console.log(JSON.stringify(drawer.getLinesInfo()))
+    localStorage.setItem('canvasLines', JSON.stringify(drawer.getLinesInfo()))
   }
 
   function loadCanvas() {
