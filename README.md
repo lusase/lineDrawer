@@ -71,7 +71,7 @@
 
 > 方法
 
-    ```
+```
         load(data: Array| String) 加载数据
         reload(data: Array| String| undefined) 重新加载数据
         newEmptyLine() 新建空线条
@@ -80,21 +80,21 @@
         on(type, cb)
         off(type, cb)
         dispose() 销毁
-    ```
+```
 > 事件
 
-      ```
+```
      'focus.dot' 控制点被选中
      'focus.path' 线条被选中
      'del.dot' 控制点被删除
-     ```
+```
 
 > 操作
 
-    ```
+```
     ctrl + 左击 新建线条
     ctrl + z 删除点
     delete 删除选中的线
-    ```
+```
 
 
