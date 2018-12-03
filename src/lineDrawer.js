@@ -133,7 +133,7 @@
     }
 
     load(data) {
-      if (!data) return
+      if (!data || !data.length) return
       if (typeof data === 'string') {
         data = JSON.parse(data)
       }
