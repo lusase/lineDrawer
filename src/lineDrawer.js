@@ -331,9 +331,19 @@
       }
     }
 
+    getLineStroke() {
+      const {lineStroke} = this.config
+      if (Array.isArray(lineStroke)) {
+        const len = lineStroke.length
+        return lineStroke[(Object.keys(this.lineMap).length - 1) % len] || '#fff'
+      }
+      return lineStroke
+    }
+
     renderLines(data = {}) {
       if (data.strokeWidth === 0) return
-      const stroke = data.stroke || this.config.lineStroke
+
+      const stroke = data.stroke || this.getLineStroke()
       const strokeWidth = data.strokeWidth || this.config.strokeWidth
       const isEditable = this.config.editable
       const pathConfig = {

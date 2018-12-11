@@ -46,7 +46,9 @@
         id: canvas元素的id
         config: 配置
             strokeWidth: 线宽, 默认为1
-            lineStroke: 线条初始化颜色, 默认黑色
+            lineStroke: 线条初始化颜色, 默认黑色,
+                        支持颜色字符串数组, 如果为颜色数组,
+                        则新画的线的颜色依次自动取值
             arrowRadius: 箭头大小, 默认6
             editable: 是否可编辑, 默认false不可编辑
             formatter: 函数, 返回html字符串用于控制tooltip显示的内容, 接受一个参数, 为当前path的配置对象
