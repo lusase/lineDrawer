@@ -1,0 +1,17 @@
+{
+  "files": [
+    "src/lineDrawer.ts"
+  ],
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "removeComments": true,
+    "sourceMap": false,
+    "outDir": "./dist"
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
