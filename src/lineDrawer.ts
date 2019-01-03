@@ -77,6 +77,7 @@ declare const require: any
 
   interface Line {
     id: string
+    idx: number
     dots
     path
   }
@@ -97,6 +98,8 @@ declare const require: any
     dataSource
     lastSelectedDot
     lastSelectedPath
+
+    static uuid: Function = uuid
 
     constructor(canvasId, {
       strokeWidth = 1,
@@ -197,7 +200,7 @@ declare const require: any
       const line = Object.values(this.lineMap).find((e: Line) => e.dots.length === 0)
       if (!line) {
         const id = uuid()
-        this.lineMap[id] = {dots: [], id, path: null}
+        this.lineMap[id] = {dots: [], id, path: null, idx: Object.keys(this.lineMap).length}
         this.currentLineId = id
       } else {
         this.currentLineId = line.id
@@ -205,9 +208,11 @@ declare const require: any
     }
 
     getLinesInfo() {
-      return Object.values(this.lineMap).map(item => {
+      return Object.values(this.lineMap).sort((a, b) => a.idx - b.idx).map(item => {
           if (!item.path) return {}
           return {
+            id: item.id,
+            selected: item.path.selected,
             strokeWidth: item.path.strokeWidth,
             stroke: item.path.stroke,
             dots: item.dots.map(e => ([e.left / this.canvas.width, e.top / this.canvas.height]))
@@ -322,6 +327,15 @@ declare const require: any
       }
     }
 
+    selectLine(id: string) {
+      if (this.lineMap[id]) {
+        this.currentLineId = id
+        this.selectDot(this.getCurrentLine().dots[0])
+        this.selectCurrentPath()
+        this.renderLines()
+      }
+    }
+
     selectDot(dot) {
       if (this.lastSelectedDot) {
         this.lastSelectedDot.set({fill: 'transparent', stroke: '#ddd', radius: 5, selected: false})
@@ -354,10 +368,11 @@ declare const require: any
     delCurrentLine() {
       if (!this.config.editable) return
       const line = this.getCurrentLine()
-      if (!line.path.selected) return
+      if (!line.path || !line.path.selected) return
       line.dots.forEach(dot => this.canvas.remove(dot))
       this.canvas.remove(line.path)
       delete this.lineMap[line.id]
+      this.emit('del.line', line)
       const keys = Object.keys(this.lineMap)
       if (keys.length) {
         this.currentLineId = keys[0]
@@ -366,6 +381,20 @@ declare const require: any
       }
     }
 
+    delLine(id: string) {
+      const line = this.lineMap[id]
+      if (!this.config.editable || !line || !line.path) return
+      line.dots.forEach(dot => this.canvas.remove(dot))
+      this.canvas.remove(line.path)
+      delete this.lineMap[id]
+      this.emit('del.line', line)
+      const keys = Object.keys(this.lineMap)
+      if (keys.length) {
+        this.currentLineId = keys[0]
+      } else {
+        this.newEmptyLine()
+      }
+    }
     getLineStroke() {
       const {lineStroke} = this.config
       if (Array.isArray(lineStroke)) {
@@ -444,6 +473,7 @@ declare const require: any
       c.name = 'dot'
       c.parentLine = line
       this.canvas.add(c)
+      this.emit('add.dot', c)
       return c
     }
 
