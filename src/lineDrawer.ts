@@ -10,6 +10,8 @@ declare const require: any
   }
 
 })(typeof window !== 'undefined' ? window : this, function (window, fabric, noGlobal?) {
+  if (!fabric)
+    throw new Error('fabric required. please install it by npm or load it by script tag')
   const {Canvas, Circle, Path} = fabric
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center'
 
