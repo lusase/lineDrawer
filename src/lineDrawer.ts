@@ -178,7 +178,8 @@ declare const require: any
       this.dataSource = data
       this.lineMap = <{ Line }>{}
       data.forEach(item => {
-        this.newEmptyLine()
+        const id = item.id !== undefined ? String(item.id) : undefined
+        this.newEmptyLine(id)
         this.convert(item.dots).forEach((e: [number, number]) => {
           const line = this.getCurrentLine()
           const dot = this.makeDot(e[0], e[1])
@@ -198,10 +199,10 @@ declare const require: any
       this.load(data)
     }
 
-    newEmptyLine() {
+    newEmptyLine(lineId?: string) {
       const line = Object.values(this.lineMap).find((e: Line) => e.dots.length === 0)
       if (!line) {
-        const id = uuid()
+        const id = lineId || uuid()
         this.lineMap[id] = {dots: [], id, path: null, idx: Object.keys(this.lineMap).length}
         this.currentLineId = id
       } else {
