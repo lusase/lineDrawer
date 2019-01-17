@@ -1,6 +1,6 @@
 {
   "name": "linedrawer",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "lineDrawer base on fabric.js ",
   "main": "dist/lineDrawer.js",
   "scripts": {
