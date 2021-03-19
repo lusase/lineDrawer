@@ -18,4 +18,4 @@ gulp.task('build', function(cb) {
       cb()
 })
 
-gulp.task('default', ['build'])
+gulp.task('default', gulp.series(gulp.parallel(['build'])))

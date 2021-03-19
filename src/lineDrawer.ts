@@ -19,6 +19,12 @@ declare const require: any
     return Array.from({length: 8}, () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substr(1)).join('')
   }
 
+  function setStyle(ele: HTMLElement, styleObj: object): void {
+    Object.keys(styleObj).forEach(e => {
+      ele.style[e] = styleObj[e]
+    })
+  }
+
   class EventEmitter {
     _events: {
       [propName: string]: ((...args: any[]) => any)[] | ((...args: any[]) => any)
@@ -92,6 +98,7 @@ declare const require: any
     canvas: {
       [propName: string]: any
       on: (l: object) => any
+      wrapperEl: HTMLElement
     }
     lineMap: { Line }
     currentLineId: string
@@ -110,7 +117,8 @@ declare const require: any
       editable = false,
       formatter = () => '',
       hasShadow = false,
-      pathOpacity = 1
+      pathOpacity = 1,
+      alwaysShowTip = false
     } = {}, data) {
       super()
       this.config = {
@@ -120,7 +128,8 @@ declare const require: any
         editable,
         formatter,
         hasShadow,
-        pathOpacity
+        pathOpacity,
+        alwaysShowTip
       }
       this.canvas = new Canvas(canvasId, {selection: false})
 
@@ -140,8 +149,6 @@ declare const require: any
       this.initListeners()
 
       data && this.load(data)
-
-      !editable && this.insertTooltip()
     }
 
     dispose() {
@@ -150,10 +157,42 @@ declare const require: any
     }
 
     insertTooltip() {
-      this.tooltip = document.createElement('div')
-      this.tooltip.className = 'tooltip'
+      if (!this.dataSource) return
+      this.removeTooltipEl()
 
-      this.canvas.wrapperEl.appendChild(this.tooltip)
+      if (this.config.alwaysShowTip) {
+        this.dataSource.forEach(item => this.insertPathTip(item))
+      } else {
+        this.tooltip = this.createTipEl()
+      }
+    }
+
+    removeTooltipEl() {
+      const {wrapperEl} = this.canvas
+      const tooltips = wrapperEl.getElementsByClassName('tooltip')
+      ;[...tooltips].forEach(e => e.remove())
+    }
+
+    insertPathTip(item): void {
+      if (item.strokeWidth === 0) return
+      item.tooltip = this.createTipEl()
+
+      item.tooltip.innerHTML = this.config.formatter(item)
+
+      const [[x1, y1], [x2, y2]] = this.convert([item.dots[0], item.dots[item.dots.length - 1]])
+      setStyle(item.tooltip, {
+        visibility: 'visible',
+        left: (x1 + x2) / 2 + 'px',
+        top: (y1 + y2) / 2 + 'px'
+      })
+    }
+
+    createTipEl(): HTMLElement {
+      const {wrapperEl} = this.canvas
+      const el = document.createElement('div')
+      el.className = 'tooltip'
+      wrapperEl.appendChild(el)
+      return el
     }
 
     resize({width, height}: { width?: number, height?: number } = {}) {
@@ -178,7 +217,8 @@ declare const require: any
       this.dataSource = data
       this.lineMap = <{ Line }>{}
       data.forEach(item => {
-        this.newEmptyLine()
+        const id = item.id !== undefined ? String(item.id) : undefined
+        this.newEmptyLine(id)
         this.convert(item.dots).forEach((e: [number, number]) => {
           const line = this.getCurrentLine()
           const dot = this.makeDot(e[0], e[1])
@@ -186,6 +226,7 @@ declare const require: any
           this.renderLines(item)
         })
       })
+      !this.config.editable && this.insertTooltip()
     }
 
     setConfig(config) {
@@ -198,12 +239,13 @@ declare const require: any
       this.load(data)
     }
 
-    newEmptyLine() {
+    newEmptyLine(lineId?: string) {
       const line = Object.values(this.lineMap).find((e: Line) => e.dots.length === 0)
       if (!line) {
-        const id = uuid()
+        const id = lineId || uuid()
         this.lineMap[id] = {dots: [], id, path: null, idx: Object.keys(this.lineMap).length}
         this.currentLineId = id
+        this.emit('add.line', this.lineMap[id])
       } else {
         this.currentLineId = line.id
       }
@@ -279,16 +321,19 @@ declare const require: any
 
     onMouseMove(e) {
       if (this.config.editable) return
-      if (!this.isToolTipHidden()) {
-        this.tooltip.style.left = e.pointer.x + 'px'
-        this.tooltip.style.top = e.pointer.y + 'px'
+      if (this.tooltip && !this.isToolTipHidden()) {
+        setStyle(this.tooltip, {
+          left: e.pointer.x + 'px',
+          top: e.pointer.y + 'px'
+        })
       }
     }
 
     onMouseOver(e) {
       if (this.config.editable) return
       const target = e.target
-      if (target && target.name === 'path') {
+      const {alwaysShowTip} = this.config
+      if (!alwaysShowTip && target && target.name === 'path') {
         this.showToolTip()
         this.tooltip.innerHTML = this.config.formatter(target._data)
       }
@@ -297,7 +342,8 @@ declare const require: any
     onMouseOut(e) {
       if (this.config.editable) return
       const target = e.target
-      if (target && target.name === 'path') {
+      const {alwaysShowTip} = this.config
+      if (!alwaysShowTip && target && target.name === 'path') {
         this.hideToolTip()
       }
     }
@@ -311,7 +357,9 @@ declare const require: any
 
     onMouseDown(e) {
       if (!this.config.editable) return
-      if (e.e.ctrlKey) this.newEmptyLine()
+      if (e.e.ctrlKey) {
+        this.newEmptyLine()
+      }
 
       const target = e.target
       if (!target) {
