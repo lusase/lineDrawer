@@ -91,6 +91,7 @@
      'focus.dot' 控制点被选中
      'focus.path' 线条被选中
      'del.dot' 控制点被删除
+     'add.line' 增加新线条
 ```
 
 > 操作
