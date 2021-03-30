@@ -13,7 +13,11 @@ gulp.task('build', function(cb) {
       .pipe(babel({
         presets: ['env', 'es2015', 'stage-0']
       }))
-      .pipe(uglify())
+      .pipe(uglify({
+        compress: {
+          drop_console: false
+        }
+      }))
       .pipe(gulp.dest('dist'))
       cb()
 })

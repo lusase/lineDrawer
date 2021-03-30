@@ -231,7 +231,7 @@ declare const require: any
 
     setConfig(config) {
       this.config = {...this.config, ...config}
-      this.reload()
+      this.reload(this.getLinesInfo())
     }
 
     reload(data = this.dataSource) {
