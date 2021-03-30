@@ -42,8 +42,64 @@
 
 <script src="../dist/lineDrawer.js"></script>
 <script>
-
-  const drawer = new LineDrawer('c', {lineStroke: '#fff', strokeWidth: 2, editable: true, pathOpacity: 0.5})
+  const data = [
+      {
+          "id": "0.03732882253871361",
+          "strokeWidth": 2,
+          "stroke": "#f00",
+          "dots": [
+              [
+                  0.19844966942881845,
+                  0.15367622375488282
+              ],
+              [
+                  0.8190755681892615,
+                  0.26034289042154946
+              ]
+          ],
+          "fromregion": [],
+          "toregion": []
+      },
+      {
+          "id": "0.7735553701558442",
+          "strokeWidth": 2,
+          "stroke": "#f00",
+          "dots": [
+              [
+                  0.3268548254559001,
+                  0.5053428904215495
+              ],
+              [
+                  0.5038996634839156,
+                  0.8286762237548827
+              ],
+              [
+                  0.7412451361867705,
+                  0.505
+              ]
+          ],
+          "fromregion": [],
+          "toregion": []
+      },
+      {
+          "id": "0.9459083367522945",
+          "strokeWidth": 2,
+          "stroke": "#f00",
+          "dots": [
+              [
+                  0.24708805007473283,
+                  0.43200955708821615
+              ],
+              [
+                  0.383277512618857,
+                  0.042009557088216146
+              ]
+          ],
+          "fromregion": [],
+          "toregion": []
+      }
+  ]
+  const drawer = new LineDrawer('c', {lineStroke: '#fff', strokeWidth: 2, editable: false, pathOpacity: 0.5}, data)
 
   drawer.on('focus.path', function(path) {
     console.log(path)

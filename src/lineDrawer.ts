@@ -153,7 +153,7 @@ declare const require: any
 
     dispose() {
       this.canvas.dispose()
-      this.config.editable && window.removeEventListener('keydown', this.onKeydown)
+      window.removeEventListener('keydown', this.onKeydown)
     }
 
     insertTooltip() {
@@ -204,7 +204,7 @@ declare const require: any
       this.reload()
     }
 
-    convert(dots): [number, number][] {
+    convert(dots = []): [number, number][] {
       const {width, height} = this.canvas
       return dots.map(e => ([e[0] * width, e[1] * height]))
     }
@@ -235,6 +235,7 @@ declare const require: any
     }
 
     reload(data = this.dataSource) {
+      console.log(data)
       this.canvas.clear()
       this.load(data)
     }
@@ -259,7 +260,7 @@ declare const require: any
             selected: item.path.selected,
             strokeWidth: item.path.strokeWidth,
             stroke: item.path.stroke,
-            dots: item.dots.map(e => ([e.left / this.canvas.width, e.top / this.canvas.height]))
+            dots: item.dots?.map(e => ([e.left / this.canvas.width, e.top / this.canvas.height]))
           }
         }
       )
@@ -284,17 +285,17 @@ declare const require: any
       this.onMouseMove = this.onMouseMove.bind(this)
       this.onKeydown = this.onKeydown.bind(this)
 
-      const canvasListeners = this.config.editable ? {
+      const canvasListeners = {
         'object:moving': this.onObjectMoving,
-        'mouse:down': this.onMouseDown
-      } : {
+        'mouse:down': this.onMouseDown,
+
         'mouse:over': this.onMouseOver,
         'mouse:out': this.onMouseOut,
         'mouse:move': this.onMouseMove
       }
       this.canvas.on(canvasListeners)
 
-      this.config.editable && window.addEventListener('keydown', this.onKeydown)
+      window.addEventListener('keydown', this.onKeydown)
     }
 
     showToolTip() {
@@ -310,6 +311,7 @@ declare const require: any
     }
 
     onKeydown(e) {
+      if (this.config.editable) return
       // delete 键 删除当前线条
       if (e.code === 'Delete') {
         this.delCurrentLine()
