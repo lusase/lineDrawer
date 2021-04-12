@@ -433,9 +433,9 @@ declare const require: any
       }
     }
 
-    delLine(id: string) {
+    delLine(id: string, force = false) {
       const line = this.lineMap[id]
-      if (!this.config.editable || !line || !line.path) return
+      if ((!force && !this.config.editable) || !line || !line.path) return
       line.dots.forEach(dot => this.canvas.remove(dot))
       this.canvas.remove(line.path)
       delete this.lineMap[id]
