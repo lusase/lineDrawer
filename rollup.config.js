@@ -1,19 +1,32 @@
 // @ts-check
+import {defineConfig} from 'rollup'
 import esbuild from 'rollup-plugin-esbuild'
-export default {
+import dts from 'rollup-plugin-dts'
+export default defineConfig([{
   input: 'src/index.ts',
   external: ['fabric'],
   plugins: [
     esbuild({
       tsconfig: './tsconfig.json',
-      sourceMap: false,
-      minify: false,
+      sourceMap: true,
+      minify: true,
       target: 'es2015'
     })
   ],
-  output: {
+  output: [{
     name: 'LineDrawer',
-    dir: 'dist',
+    file: 'dist/linedrawer.js',
     format: 'umd'
+  }, {
+    name: 'LineDrawer',
+    file: 'dist/linedrawer.esm.js',
+    format: 'esm'
+  }]
+}, {
+  input: 'src/index.ts',
+  plugins: [dts()],
+  output: {
+    format: 'esm',
+    file: 'dist/linedrawer.d.ts'
   }
-}
+}])

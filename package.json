@@ -1,9 +1,11 @@
 {
   "name": "linedrawer",
-  "version": "0.3.0",
+  "version": "0.3.3",
   "description": "lineDrawer base on fabric.js ",
   "main": "index.js",
   "type": "module",
+  "module": "dist/linedrawer.esm.js",
+  "types": "dist/linedrawer.d.ts",
   "files": [
     "index.js",
     "dist/*",
@@ -31,6 +33,7 @@
     "esbuild": "^0.18.17",
     "execa": "^7.2.0",
     "rollup": "^3.27.0",
+    "rollup-plugin-dts": "^5.3.1",
     "rollup-plugin-esbuild": "^5.0.0",
     "rollup-plugin-typescript2": "^0.35.0",
     "typescript": "^5.1.6"
