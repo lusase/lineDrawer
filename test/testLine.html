@@ -42,7 +42,7 @@
 <script>
   fabric.fabric = fabric
 </script>
-<script src="../dist/Drawer.js"></script>
+<script src="../dist/Sketchpad.js"></script>
 <script>
   const data = [
     {
@@ -101,7 +101,7 @@
       "toregion": []
     }
   ]
-  const drawer = new Drawer.Drawer('c', {lineStroke: '#fff', strokeWidth: 2, editable: false, pathOpacity: 0.5})
+  const drawer = new Sketchpad.Sketchpad('c', {lineStroke: '#fff', strokeWidth: 2, editable: false, pathOpacity: 0.5})
 
   setTimeout(() => {
     drawer.load(data)

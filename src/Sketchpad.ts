@@ -1,33 +1,8 @@
 import {fabric} from 'fabric'
 import {EventEmitter} from './EventEmitter'
+import {ArrowLine, ArrowLineData, SketchConfig} from './type/drawer'
+import {defCfg, mergeDefault} from './util'
 
-interface Config {
-  strokeWidth?: number
-  lineStroke?: string
-  arrowRadius?: number
-  editable?: boolean
-  formatter?: (param: unknown) => string
-  hasShadow?: boolean,
-  pathOpacity?: number,
-  alwaysShowTip?: boolean,
-  bgUrl?: string
-}
-
-interface Line {
-  id: string
-  idx: number
-  lineDots: fabric.Circle[]
-  path: fabric.Path
-  selected?: boolean
-}
-
-interface LineData {
-  strokeWidth: number
-  stroke: string
-  dots: [number, number][]
-  id: string
-  tooltip?: HTMLElement
-}
 
 function setStyle(ele: HTMLElement, styleObj: object): void {
   Object.keys(styleObj).forEach(e => {
@@ -35,12 +10,11 @@ function setStyle(ele: HTMLElement, styleObj: object): void {
   })
 }
 
-export class Drawer extends EventEmitter{
-  config: Config
+export class Sketchpad extends EventEmitter {
   canvas: fabric.Canvas & {
     wrapperEl?: HTMLElement
   }
-  lineMap: Record<string, Line> = {}
+  lineMap: Record<string, ArrowLine> = {}
   currentLineId: string
   pathShadow = new fabric.Shadow({
     color: '#fff',
@@ -49,48 +23,26 @@ export class Drawer extends EventEmitter{
     offsetY: 0.5
   })
   tooltip: HTMLElement
-  dataSource: LineData[] = []
+  dataSource: ArrowLineData[] = []
   lastSelectedDot: fabric.Circle
   lastSelectedPath: fabric.Path
-
   static uuid(): string {
     return Array.from({length: 8}, () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substr(1)).join('')
   }
-
-  constructor(canvasId: string, {
-    strokeWidth = 1,
-    lineStroke = '#000',
-    arrowRadius = 6,
-    editable = false,
-    formatter = () => '',
-    hasShadow = false,
-    pathOpacity = 1,
-    alwaysShowTip = false,
-    bgUrl = ''
-  }: Config = {}, data: LineData[]) {
+  constructor(canvasId: string, public config: SketchConfig = {}, data: ArrowLineData[]) {
     super()
-    this.config = {
-      strokeWidth,
-      lineStroke,
-      arrowRadius,
-      editable,
-      formatter,
-      hasShadow,
-      pathOpacity,
-      alwaysShowTip,
-      bgUrl
-    }
+    mergeDefault(config, defCfg)
     this.canvas = new fabric.Canvas(canvasId, {selection: false})
-
     this.currentLineId = null
-
+    this.initBg()
     this.newEmptyLine()
-
     this.initListeners()
-
     data && this.load(data)
   }
+  initBg() {
+    if (!this.config.bgUrl) return
 
+  }
   dispose() {
     this.canvas.dispose()
     window.removeEventListener('keydown', this.onKeydown)
@@ -113,7 +65,7 @@ export class Drawer extends EventEmitter{
     ;[...tooltips].forEach(e => e.remove())
   }
 
-  insertPathTip(item: LineData): void {
+  insertPathTip(item: ArrowLineData): void {
     if (item.strokeWidth === 0) return
 
     item.tooltip = this.createTipEl()
@@ -149,10 +101,10 @@ export class Drawer extends EventEmitter{
     return dots.map(e => ([e[0] * width, e[1] * height]))
   }
 
-  load(data: LineData[] | string) {
+  load(data: ArrowLineData[] | string) {
     if (!data || !data.length) return
     if (typeof data === 'string') {
-      data = JSON.parse(data) as LineData[]
+      data = JSON.parse(data) as ArrowLineData[]
     }
     this.dataSource = data
     this.dataSource.forEach(item => {
@@ -168,7 +120,7 @@ export class Drawer extends EventEmitter{
     !this.config.editable && this.insertTooltip()
   }
 
-  setConfig(config: Config) {
+  setConfig(config: SketchConfig) {
     this.config = {...this.config, ...config}
     this.reload(this.getLinesInfo())
   }
@@ -179,9 +131,9 @@ export class Drawer extends EventEmitter{
   }
 
   newEmptyLine(lineId?: string) {
-    const line = Object.values(this.lineMap).find((e: Line) => e.lineDots.length === 0)
+    const line = Object.values(this.lineMap).find((e: ArrowLine) => e.lineDots.length === 0)
     if (!line) {
-      const id = lineId || Drawer.uuid()
+      const id = lineId || Sketchpad.uuid()
       this.lineMap[id] = {lineDots: [], id, path: null, idx: Object.keys(this.lineMap).length}
       this.currentLineId = id
       this.emit('add.line', this.lineMap[id])
@@ -206,7 +158,7 @@ export class Drawer extends EventEmitter{
       }).filter(Boolean)
   }
 
-  getCurrentLine(): Line {
+  getCurrentLine(): ArrowLine {
     return this.lineMap[this.currentLineId]
   }
 
@@ -224,13 +176,13 @@ export class Drawer extends EventEmitter{
     this.onMouseOut = this.onMouseOut.bind(this)
     this.onMouseMove = this.onMouseMove.bind(this)
     this.onKeydown = this.onKeydown.bind(this)
-
+    this.onMouseWheel = this.onMouseWheel.bind(this)
     this.canvas.on('object:moving', this.onObjectMoving)
     this.canvas.on('mouse:down', this.onMouseDown)
     this.canvas.on('mouse:over', this.onMouseOver)
     this.canvas.on('mouse:out', this.onMouseOut)
     this.canvas.on('mouse:move', this.onMouseMove)
-
+    this.canvas.on('mouse:wheel', this.onMouseWheel)
     window.addEventListener('keydown', this.onKeydown)
   }
 
@@ -292,6 +244,20 @@ export class Drawer extends EventEmitter{
     if (e.target.name === 'dot') {
       this.renderLines()
     }
+  }
+
+  onMouseWheel(e: fabric.IEvent<WheelEvent>) {
+    if (!this.config.scalable) return
+    const delta = e.e.deltaY
+    const x = e.e.offsetX
+    const y = e.e.offsetY
+    let zoom = this.canvas.getZoom()
+    zoom *= 0.999 ** delta
+    if (zoom > 20) zoom = 20
+    if (zoom < 0.01) zoom = 0.01
+    this.canvas.zoomToPoint({x, y}, zoom)
+    e.e.preventDefault()
+    e.e.stopPropagation()
   }
 
   onMouseDown(e: fabric.IEvent<MouseEvent>) {

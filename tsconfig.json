@@ -1,6 +1,6 @@
 {
   "files": [
-    "src/Drawer.ts"
+    "src/Sketchpad.ts"
   ],
   "compilerOptions": {
     "target": "es2017",

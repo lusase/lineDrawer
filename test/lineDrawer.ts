@@ -1,3 +1,4 @@
+/*
 
 declare const module: any
 declare const require: any
@@ -592,3 +593,4 @@ declare const require: any
 
   return LineDrawer
 })
+*/

@@ -2,7 +2,7 @@
 import esbuild from 'rollup-plugin-esbuild'
 import nodePloyfills from 'rollup-plugin-polyfill-node'
 export default {
-  input: 'src/Drawer.ts',
+  input: 'src/Sketchpad.ts',
   external: ['fabric'],
   plugins: [
     nodePloyfills(),
@@ -14,7 +14,7 @@ export default {
     })
   ],
   output: {
-    name: 'Drawer',
+    name: 'Sketchpad',
     dir: 'dist',
     format: 'umd'
   }
