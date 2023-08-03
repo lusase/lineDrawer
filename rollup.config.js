@@ -1,11 +1,9 @@
 // @ts-check
 import esbuild from 'rollup-plugin-esbuild'
-import nodePloyfills from 'rollup-plugin-polyfill-node'
 export default {
   input: 'src/index.ts',
   external: ['fabric'],
   plugins: [
-    nodePloyfills(),
     esbuild({
       tsconfig: './tsconfig.json',
       sourceMap: false,
@@ -14,7 +12,7 @@ export default {
     })
   ],
   output: {
-    name: 'Sketchpad',
+    name: 'LineDrawer',
     dir: 'dist',
     format: 'umd'
   }

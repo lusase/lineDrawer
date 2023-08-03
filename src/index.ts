@@ -1,4 +1,5 @@
 
-export {Sketchpad} from './Sketchpad'
+import {LineDrawer} from './LineDrawer'
 
-export {LineDrawer} from './LineDrawer'
+export {LineDrawer}
+export default LineDrawer
