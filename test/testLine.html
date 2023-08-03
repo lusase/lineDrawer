@@ -42,7 +42,7 @@
 <script>
   fabric.fabric = fabric
 </script>
-<script src="../dist/Sketchpad.js"></script>
+<script src="../dist/index.js"></script>
 <script>
   const data = [
     {
@@ -64,7 +64,7 @@
     },
     {
       "id": "0.7735553701558442",
-      "strokeWidth": 2,
+      "strokeWidth": 10,
       "stroke": "#f00",
       "dots": [
         [
@@ -85,8 +85,8 @@
     },
     {
       "id": "0.9459083367522945",
-      "strokeWidth": 2,
-      "stroke": "#f00",
+      "strokeWidth": 8,
+      "stroke": "#00f",
       "dots": [
         [
           0.24708805007473283,
@@ -101,7 +101,13 @@
       "toregion": []
     }
   ]
-  const drawer = new Sketchpad.Sketchpad('c', {lineStroke: '#fff', strokeWidth: 2, editable: false, pathOpacity: 0.5})
+  const drawer = new Sketchpad.LineDrawer('c', {
+    lineStroke: '#fff',
+    strokeWidth: 2,
+    editable: false,
+    pathOpacity: 0.5,
+    bgUrl: './bg.jpg'
+  })
 
   setTimeout(() => {
     drawer.load(data)

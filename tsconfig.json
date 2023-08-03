@@ -1,6 +1,6 @@
 {
   "files": [
-    "src/Sketchpad.ts"
+    "src/index.ts"
   ],
   "compilerOptions": {
     "target": "es2017",
