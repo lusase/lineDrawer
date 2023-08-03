@@ -1,3 +1,4 @@
+
 declare const module: any
 declare const require: any
 
@@ -90,6 +91,18 @@ declare const require: any
     path
   }
 
+  interface Config {
+    strokeWidth?: number
+    lineStroke?: string
+    arrowRadius?: number
+    editable?: false
+    formatter?: (param: unknown) => string
+    hasShadow?: boolean,
+    pathOpacity?: number,
+    alwaysShowTip?: boolean,
+    bgUrl?: string
+  }
+
   class LineDrawer extends EventEmitter {
     config: {
       formatter: (obj: any) => any
@@ -118,8 +131,9 @@ declare const require: any
       formatter = () => '',
       hasShadow = false,
       pathOpacity = 1,
-      alwaysShowTip = false
-    } = {}, data) {
+      alwaysShowTip = false,
+      bgUrl = ''
+    }: Config = {}, data) {
       super()
       this.config = {
         strokeWidth,
@@ -129,9 +143,14 @@ declare const require: any
         formatter,
         hasShadow,
         pathOpacity,
-        alwaysShowTip
+        alwaysShowTip,
+        bgUrl
       }
       this.canvas = new Canvas(canvasId, {selection: false})
+
+      if (this.config.bgUrl) {
+        this.canvas
+      }
 
       this.lineMap = <{ Line }>{}
 

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/fabric.js/5.3.1/fabric.js"></script>
+</head>
+<body onload="loadCanvas()">
+
+<div style="color: #fff">
+  <span style="background: aqua   ">aqua 水绿色</span>
+  <span style="background: fuchsia">fuchsia 紫红色</span>
+  <span style="background: lime   ">lime 黄绿色</span>
+  <span style="background: maroon ">maroon 红褐色</span>
+  <span style="background: navy   ">navy 藏青色</span>
+  <span style="background: olive  ">olive 黄褐色</span>
+  <span style="background: silver ">silver 银色</span>
+  <span style="background: teal   ">teal 蓝绿色</span>
+  <span style="background: purple ">purple 紫色</span>
+  <span style="background: orange ">orange 橘黄色</span>
+</div>
+<div style="margin: 20px;width: 640px;height: 480px;background: #ccc;">
+  <canvas id="c" width="640" height="480"></canvas>
+</div>
+
+<button style="margin-top: 30px" onclick="addNewLine()">新建线条</button>
+<button style="margin-top: 30px" onclick="delCurrentDot()">删除选中的点</button>
+<button style="margin-top: 30px" onclick="delCurrentLine()">删除选中的线条</button>
+<button style="margin-top: 30px" onclick="saveCanvas()">保存</button>
+<button style="margin-top: 30px" onClick="toggleEditable()">可拖动/不可拖动</button>
+<div>
+  颜色 <input id="color">
+  <button onclick="setLineColor()">保存颜色</button>
+</div>
+<div>
+  宽度 <input id="width">
+  <button onclick="setLineWidth()">保存宽度</button>
+</div>
+<script>
+  fabric.fabric = fabric
+</script>
+<script src="../dist/Drawer.js"></script>
+<script>
+  const data = [
+    {
+      "id": "0.03732882253871361",
+      "strokeWidth": 2,
+      "stroke": "#f00",
+      "dots": [
+        [
+          0.19844966942881845,
+          0.15367622375488282
+        ],
+        [
+          0.8190755681892615,
+          0.26034289042154946
+        ]
+      ],
+      "fromregion": [],
+      "toregion": []
+    },
+    {
+      "id": "0.7735553701558442",
+      "strokeWidth": 2,
+      "stroke": "#f00",
+      "dots": [
+        [
+          0.3268548254559001,
+          0.5053428904215495
+        ],
+        [
+          0.5038996634839156,
+          0.8286762237548827
+        ],
+        [
+          0.7412451361867705,
+          0.505
+        ]
+      ],
+      "fromregion": [],
+      "toregion": []
+    },
+    {
+      "id": "0.9459083367522945",
+      "strokeWidth": 2,
+      "stroke": "#f00",
+      "dots": [
+        [
+          0.24708805007473283,
+          0.43200955708821615
+        ],
+        [
+          0.383277512618857,
+          0.042009557088216146
+        ]
+      ],
+      "fromregion": [],
+      "toregion": []
+    }
+  ]
+  const drawer = new Drawer.Drawer('c', {lineStroke: '#fff', strokeWidth: 2, editable: false, pathOpacity: 0.5})
+
+  setTimeout(() => {
+    drawer.load(data)
+  }, 1000)
+
+  drawer.on('focus.path', function(path) {
+    console.log(path)
+  })
+
+  function addNewLine() {
+    drawer.newEmptyLine()
+  }
+
+  function delCurrentDot() {
+    drawer.delSelectedDot()
+  }
+
+  function delCurrentLine() {
+    drawer.delCurrentLine()
+  }
+
+  function saveCanvas() {
+    console.log(JSON.stringify(drawer.getLinesInfo()))
+    localStorage.setItem('canvasLines', JSON.stringify(drawer.getLinesInfo()))
+  }
+
+  function loadCanvas() {
+    drawer.load(localStorage.getItem('canvasLines'))
+  }
+
+  function setLineColor() {
+    const value = document.getElementById('color').value
+    drawer.configCurrentPath({stroke: value})
+  }
+
+  function setLineWidth() {
+    const value = +document.getElementById('width').value
+    drawer.configCurrentPath({strokeWidth: value})
+  }
+
+  function toggleEditable() {
+    drawer.setConfig({editable: !drawer.config.editable})
+  }
+</script>
+</body>
+</html>

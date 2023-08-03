@@ -2,9 +2,10 @@
   "name": "linedrawer",
   "version": "0.2.6",
   "description": "lineDrawer base on fabric.js ",
-  "main": "dist/lineDrawer.js",
+  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node scripts/build.js"
   },
   "keywords": [
     "lineDrawer",
@@ -13,24 +14,24 @@
   ],
   "author": "qtxz2000 <atpick@163.com>",
   "license": "MIT",
-  "dependencies": {
-    "fabric": "^2.4.4"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/lusase/lineDrawer"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1",
-    "del": "^3.0.0",
-    "gulp": "^4.0.2",
-    "gulp-babel": "^7.0.1",
-    "gulp-typescript": "^5.0.0",
-    "gulp-uglify": "^3.0.1",
-    "run-sequence": "^2.2.1",
-    "typescript": "^3.2.2"
+    "@babel/parser": "^7.22.7",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@types/fabric": "^5.3.0",
+    "@types/node": "^20.4.6",
+    "esbuild": "^0.18.17",
+    "execa": "^7.2.0",
+    "rollup": "^3.27.0",
+    "rollup-plugin-esbuild": "^5.0.0",
+    "rollup-plugin-polyfill-node": "^0.12.0",
+    "rollup-plugin-typescript2": "^0.35.0",
+    "typescript": "^5.1.6"
+  },
+  "peerDependencies": {
+    "fabric": "^5.3.0"
   }
 }
