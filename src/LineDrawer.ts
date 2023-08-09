@@ -28,7 +28,6 @@ export class LineDrawer extends Sketchpad {
     super(canvasId, config)
     this.currentLineId = null
     this.newEmptyLine()
-    this.initListeners()
     data && this.load(data)
   }
 
@@ -89,20 +88,6 @@ export class LineDrawer extends Sketchpad {
   reload(data = this.dataSource) {
     super.reload()
     this.load(data)
-  }
-  initListeners() {
-    this.onObjectMoving = this.onObjectMoving.bind(this)
-    this.onMouseDown = this.onMouseDown.bind(this)
-    this.onMouseOver = this.onMouseOver.bind(this)
-    this.onMouseOut = this.onMouseOut.bind(this)
-    this.onMouseMove = this.onMouseMove.bind(this)
-    this.onKeydown = this.onKeydown.bind(this)
-    this.canvas.on('object:moving', this.onObjectMoving)
-    this.canvas.on('mouse:down', this.onMouseDown)
-    this.canvas.on('mouse:over', this.onMouseOver)
-    this.canvas.on('mouse:out', this.onMouseOut)
-    this.canvas.on('mouse:move', this.onMouseMove)
-    window.addEventListener('keydown', this.onKeydown)
   }
   newEmptyLine(lineId?: string) {
     const line = Object.values(this.lineMap).find((e: ArrowLine) => e.lineDots.length === 0)
@@ -355,39 +340,5 @@ export class LineDrawer extends Sketchpad {
     this.canvas.add(c)
     this.emit('add.dot', c)
     return c
-  }
-  makeSvgCurvePath(...points: [number, number][]) {
-    const len = points.length
-    if (len < 2) return ''
-
-    const endP = points[len - 1]
-    const endP2 = points[len - 2]
-    const angle = Math.PI / 6
-    const {arrowRadius} = this.config
-    const yDiff = endP2[1] - endP[1]
-    const xDiff = endP[0] - endP2[0]
-    const slope = Math.atan(yDiff / xDiff)
-
-    const fix = xDiff < 0 ? -1 : 1
-
-    const x1 = endP[0] - Math.cos(slope + angle) * arrowRadius * fix
-    const y1 = endP[1] + Math.sin(slope + angle) * arrowRadius * fix
-    const x2 = endP[0] - Math.cos(slope - angle) * arrowRadius * fix
-    const y2 = endP[1] + Math.sin(slope - angle) * arrowRadius * fix
-
-    const arrowPath = [['M', x1, y1], ['L', ...endP], ['L', x2, y2], ['L', x1, y1], ['L', ...endP]]
-
-    if (len === 2)
-      return [['M', ...points[0]], ['L', ...points[1]], ...arrowPath]
-        .map(item => item.join(',')).join('')
-
-    let path = [['M', ...points[0]]]
-    for (let i = 1; i < len - 1; i++) {
-      let x = (points[i][0] + points[i + 1][0]) / 2
-      let y = (points[i][1] + points[i + 1][1]) / 2
-      path.push(['Q', ...points[i], x, y])
-    }
-    path.push(['T', ...endP], ...arrowPath)
-    return path.map(item => item.join(',')).join('')
   }
 }

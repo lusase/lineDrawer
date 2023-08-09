@@ -4,7 +4,7 @@ import {SketchConfig} from './type/drawer'
 import {defCfg, mergeDefault} from './util'
 
 
-export class Sketchpad extends EventEmitter {
+export abstract class Sketchpad extends EventEmitter {
   canvas: fabric.Canvas & {
     wrapperEl?: HTMLElement
   }
@@ -12,15 +12,19 @@ export class Sketchpad extends EventEmitter {
   static uuid(): string {
     return Array.from({length: 8}, () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substr(1)).join('')
   }
-  constructor(
+  protected constructor(
     canvasId: string,
     public config: SketchConfig = {}
   ) {
     super()
     mergeDefault(config, defCfg)
-    this.canvas = new fabric.Canvas(canvasId, {selection: false})
+    this.canvas = new fabric.Canvas(canvasId, {
+      selection: false,
+      preserveObjectStacking: true
+    })
     this.initBg()
     this.initHandlers()
+    this.initListeners()
   }
   initBg() {
     if (!this.config.bgUrl) return
@@ -38,6 +42,29 @@ export class Sketchpad extends EventEmitter {
       }
     )
   }
+
+  abstract onObjectMoving(e: fabric.IEvent<MouseEvent>): void
+  abstract onMouseDown(e: fabric.IEvent<MouseEvent>): void
+  abstract onMouseOver(e: fabric.IEvent<MouseEvent>): void
+  abstract onMouseOut(e: fabric.IEvent<MouseEvent>): void
+  abstract onMouseMove(e: fabric.IEvent<MouseEvent>): void
+  abstract onKeydown(e: KeyboardEvent): void
+
+  initListeners() {
+    this.onObjectMoving = this.onObjectMoving.bind(this)
+    this.onMouseDown = this.onMouseDown.bind(this)
+    this.onMouseOver = this.onMouseOver.bind(this)
+    this.onMouseOut = this.onMouseOut.bind(this)
+    this.onMouseMove = this.onMouseMove.bind(this)
+    this.onKeydown = this.onKeydown.bind(this)
+    this.canvas.on('object:moving', this.onObjectMoving)
+    this.canvas.on('mouse:down', this.onMouseDown)
+    this.canvas.on('mouse:over', this.onMouseOver)
+    this.canvas.on('mouse:out', this.onMouseOut)
+    this.canvas.on('mouse:move', this.onMouseMove)
+    window.addEventListener('keydown', this.onKeydown)
+  }
+
   dispose() {
     this.canvas.dispose()
   }
@@ -78,6 +105,8 @@ export class Sketchpad extends EventEmitter {
     this.scaleHandler = this.scaleHandler.bind(this)
     this.canvas.on('mouse:down', this.panHandler)
     this.canvas.on('mouse:wheel', this.scaleHandler)
+    this.canvas.wrapperEl
+      .addEventListener('contextmenu', e => e.preventDefault())
   }
 
   showToolTip() {
@@ -123,5 +152,71 @@ export class Sketchpad extends EventEmitter {
 
   getCanvasInfo() {
     return this.canvas.toJSON()
+  }
+  makeSvgCurvePath(...points: [number, number][]) {
+    const len = points.length
+    if (len < 2) return ''
+
+    const endP = points[len - 1]
+    const endP2 = points[len - 2]
+    const angle = Math.PI / 6
+    const {arrowRadius} = this.config
+    const yDiff = endP2[1] - endP[1]
+    const xDiff = endP[0] - endP2[0]
+    const slope = Math.atan(yDiff / xDiff)
+
+    const fix = xDiff < 0 ? -1 : 1
+
+    const x1 = endP[0] - Math.cos(slope + angle) * arrowRadius * fix
+    const y1 = endP[1] + Math.sin(slope + angle) * arrowRadius * fix
+    const x2 = endP[0] - Math.cos(slope - angle) * arrowRadius * fix
+    const y2 = endP[1] + Math.sin(slope - angle) * arrowRadius * fix
+
+    const arrowPath = [['M', x1, y1], ['L', ...endP], ['L', x2, y2], ['L', x1, y1], ['L', ...endP]]
+
+    if (len === 2)
+      return [['M', ...points[0]], ['L', ...points[1]], ...arrowPath]
+        .map(item => item.join(',')).join('')
+
+    let path = [['M', ...points[0]]]
+    for (let i = 1; i < len - 1; i++) {
+      let x = (points[i][0] + points[i + 1][0]) / 2
+      let y = (points[i][1] + points[i + 1][1]) / 2
+      path.push(['Q', ...points[i], x, y])
+    }
+    path.push(['T', ...endP], ...arrowPath)
+    return path.map(item => item.join(',')).join('')
+  }
+  makeCtlDot(pointer: fabric.IPoint) {
+    const dot = new fabric.Circle({
+      left: pointer.x,
+      top: pointer.y,
+      originX: 'center',
+      originY: 'center',
+      radius: 5,
+      strokeWidth: 2,
+      fill: '#0018ff',
+      stroke: '#f0f0f0',
+      evented: this.config.editable,
+      hasBorders: false,
+      hasControls: false
+    })
+    return dot
+  }
+
+  getPathStr(dots: fabric.IPoint[]) {
+    if (dots.length < 2) return ''
+    const start = 'M '
+    const middle = dots.filter(Boolean).map(({x, y}) => {
+      return `${x},${y}`
+    }).join('L')
+    const end = ' z'
+    return start + middle + end
+  }
+  add2Cvs(...objs: fabric.Object[]) {
+    this.canvas.add(...objs)
+  }
+  rmFCvs(...objs: fabric.Object[]) {
+    this.canvas.remove(...objs)
   }
 }
