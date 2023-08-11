@@ -1,5 +1,6 @@
-import {GEventName, IGEvent} from './type/drawer'
+import {GEventName, IGEvent, LEventName} from './type/drawer'
 import {GraphicDrawer} from './GraphicDrawer'
+import {fabric} from 'fabric'
 
 export class EventEmitter {
   _events: {
@@ -22,7 +23,7 @@ export class EventEmitter {
     return this
   }
 
-  off(type: string, listener): EventEmitter {
+  off(type: string, listener: () => void): EventEmitter {
     if (!this._events[type]) return this
     if (!listener) delete this._events[type]
     const list = this._events[type]
@@ -37,18 +38,17 @@ export class EventEmitter {
     return this
   }
 
-  emit(type: GEventName, e: IGEvent<any>): boolean
-  emit(type: string, e: unknown): boolean {
+  emit(type: GEventName, e: IGEvent<any>): unknown
+  emit(type: LEventName, e: object): unknown
+  emit(type: string, e: unknown): unknown {
     const handler = this._events[type]
     if (!handler) return false
     if (typeof handler === 'function') {
-      handler.call(this, e)
-      return true
+      return handler.call(this, e)
     } else if (Array.isArray(handler)) {
-      handler.forEach(item => {
-        item.call(this, e)
+      return handler.map(item => {
+        return item.call(this, e)
       })
-      return true
     } else {
       return false
     }

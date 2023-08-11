@@ -41,5 +41,13 @@ export interface IGEvent<T> {
 
 export type GEventName =
   'graph.create'
-  |'graph.delete'
-  |'graph.click'
+  | 'graph.delete'
+  | 'graph.click'
+  | 'graph.beforeDel'
+export type LEventName =
+  'add.line'
+  | 'add.dot'
+  | 'del.line'
+  | 'del.dot'
+  | 'focus.path'
+  | 'focus.dot'
