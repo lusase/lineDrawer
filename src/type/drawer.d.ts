@@ -29,9 +29,14 @@ export interface ArrowLineData {
   tooltip?: HTMLElement
 }
 
+export interface IData {
+  id?: string
+  name?: string
+}
+
 export interface IGEvent<T> {
   target?: T
-  data?: any
+  data?: IData
 }
 
 export type GEventName =

@@ -1,6 +1,6 @@
 import {IEvent} from 'fabric/fabric-impl'
 import {Sketchpad} from './Sketchpad'
-import {GEventName, SketchConfig} from './type/drawer'
+import {SketchConfig} from './type/drawer'
 import {Graphic} from './Graphic'
 
 export type DrawType = 'polygon' | 'rectangle' | 'circle'
@@ -34,8 +34,11 @@ export class GraphicDrawer extends Sketchpad {
   onKeydown(e: KeyboardEvent): void {
     if (!this.config.editable) return
     if (e.code === 'Delete') {
+      const {id, name} = this.currentGraphic
       this.currentGraphic?.destroy()
-      this.emit('graph.delete', {data: this.currentGraphic.id})
+      this.emit('graph.delete', {
+        data:{id, name}
+      })
     }
   }
 

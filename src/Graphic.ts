@@ -33,6 +33,7 @@ const timeoutFn = (function useTimeout() {
 
 export class Graphic {
   id: string
+  name?: string
   closed: boolean = false
   private active: boolean = true
   graph: fabric.Group
@@ -83,7 +84,10 @@ export class Graphic {
     this.renderPath()
     this.addClosedListeners()
     this.renderVertexes()
-    this.ctx.emit('graph.create', {target: this, data: this.id})
+    this.ctx.emit('graph.create', {
+      target: this,
+      data: {id: this.id, name: this.name}
+    })
   }
 
   private renderVertexes() {
@@ -167,7 +171,10 @@ export class Graphic {
   }
 
   onPathMouseDown(e: IEvent<MouseEvent>) {
-    this.ctx.emit('graph.click', {target: this, data: this.id})
+    this.ctx.emit('graph.click', {
+      target: this,
+      data: {id: this.id, name: this.name}
+    })
   }
 
   renderPath() {
