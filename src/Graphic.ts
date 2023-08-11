@@ -1,6 +1,7 @@
 import {fabric} from 'fabric'
 import {DrawType, GraphicDrawer} from './GraphicDrawer'
 import {Sketchpad} from './Sketchpad'
+import {IEvent} from 'fabric/fabric-impl'
 
 type GraphicCfg = {
   id?: string
@@ -82,6 +83,7 @@ export class Graphic {
     this.renderPath()
     this.addClosedListeners()
     this.renderVertexes()
+    this.ctx.emit('graph.create', {target: this, data: this.id})
   }
 
   private renderVertexes() {
@@ -156,14 +158,21 @@ export class Graphic {
   }
 
   addClosedListeners() {
+    this.onPathMouseDown = this.onPathMouseDown.bind(this)
     this.onObjectMoving = this.onObjectMoving.bind(this)
     this.ctx.canvas.on('object:moving', this.onObjectMoving)
   }
   removeClosedListeners() {
     this.ctx.canvas.off('object:moving', this.onObjectMoving)
   }
+
+  onPathMouseDown(e: IEvent<MouseEvent>) {
+    this.ctx.emit('graph.click', {target: this, data: this.id})
+  }
+
   renderPath() {
     if (this.path) {
+      this.path.off('mouse:down', this.onPathMouseDown)
       this.ctx.rmFCvs(this.path)
     }
     const dots = this.closed ? this.dots : [...this.dots, this.movePointer]
@@ -172,6 +181,7 @@ export class Graphic {
     this.path = new fabric.Path(pathStr, cfg)
     this.path.name = this.pathName
     this.path.data = {x: this.path.left, y: this.path.top, _graphic: this}
+    this.path.on('mouse:down', this.onPathMouseDown)
     this.ctx.add2Cvs(this.path)
     this.path.sendToBack()
   }

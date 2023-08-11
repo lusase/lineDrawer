@@ -29,3 +29,12 @@ export interface ArrowLineData {
   tooltip?: HTMLElement
 }
 
+export interface IGEvent<T> {
+  target?: T
+  data?: any
+}
+
+export type GEventName =
+  'graph.create'
+  |'graph.delete'
+  |'graph.click'
