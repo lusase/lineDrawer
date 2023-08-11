@@ -92,6 +92,13 @@ export abstract class Sketchpad extends EventEmitter {
     this.reload()
   }
 
+  recover() {
+    this.canvas.setZoom(1)
+    const vpt = this.canvas.viewportTransform
+    vpt[4] = 0
+    vpt[5] = 0
+  }
+
   setConfig(config: SketchConfig) {
     this.config = {...this.config, ...config}
   }

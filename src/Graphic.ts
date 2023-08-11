@@ -33,7 +33,7 @@ const timeoutFn = (function useTimeout() {
 export class Graphic {
   id: string
   closed: boolean = false
-  active: boolean = true
+  private active: boolean = true
   graph: fabric.Group
   path: fabric.Path
   movePointer: fabric.IPoint
@@ -50,6 +50,10 @@ export class Graphic {
     this.vertexName = 'vertex' + this.id
     this.pathName = 'path' + this.id
     this.addDrawingListeners()
+  }
+
+  isActive() {
+    return this.active
   }
 
   makeStartDot(point: fabric.IPoint) {

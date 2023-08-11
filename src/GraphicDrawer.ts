@@ -13,6 +13,26 @@ export class GraphicDrawer extends Sketchpad {
     super(canvasId, config)
   }
 
+  toReadonlyState() {
+    this.config.editable = false
+    this.graphicMap.forEach(g => g.isActive() && g.blur())
+  }
+
+  toEditingState() {
+    this.config.editable = true
+
+  }
+
+  setConfig(config: SketchConfig) {
+    const {editable} = this.config
+    if (editable && !config.editable) {
+      this.toReadonlyState()
+    } else if (!editable && config.editable) {
+      this.toEditingState()
+    }
+    super.setConfig(config)
+  }
+
   onKeydown(e: KeyboardEvent): void {
     if (!this.config.editable) return
     if (e.code === 'Delete') {
