@@ -78,6 +78,16 @@ export class GraphicDrawer extends Sketchpad {
   onObjectMoving(e: IEvent<MouseEvent>): void {
   }
 
+  focus(graph: Graphic) {
+    if (!graph) return
+    if (this.currentGraphic === graph) {
+      return graph.focus()
+    }
+    this.currentGraphic?.blur()
+    this.currentGraphic = graph
+    this.currentGraphic.focus()
+  }
+
   private polygonMouseDown(e: IEvent<MouseEvent>) {
     // 点到了空白区域
     if(!e.target) {
@@ -90,9 +100,7 @@ export class GraphicDrawer extends Sketchpad {
     } else if(e.target.data?._graphic){
       const graphic = e.target.data._graphic as Graphic
       if(this.currentGraphic.closed && graphic !== this.currentGraphic) {
-        this.currentGraphic.blur()
-        this.currentGraphic = graphic
-        this.currentGraphic.focus()
+        this.focus(graphic)
       }
     }
   }
