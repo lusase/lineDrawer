@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "build": "node scripts/build.js",
-    "publish": "pnpm run build & npm publish"
+    "pub": "pnpm run build & npm publish"
   },
   "keywords": [
     "lineDrawer",

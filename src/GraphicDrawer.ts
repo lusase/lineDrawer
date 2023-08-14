@@ -6,7 +6,7 @@ import {Graphic} from './Graphic'
 export type DrawType = 'polygon' | 'rectangle' | 'circle'
 
 export type DataType = {
-  drawType: DataType
+  drawType: DrawType
   graphics: {
     id: string
     name: string
@@ -15,7 +15,7 @@ export type DataType = {
 }
 
 export class GraphicDrawer extends Sketchpad {
-  drawType: 'polygon' | 'rectangle' | 'circle' = 'polygon'
+  drawType: DrawType = 'polygon'
   currentGraphic: Graphic = null
   graphicMap = new Map<string, Graphic>()
   constructor(canvasId: string, public config: SketchConfig = {}) {
