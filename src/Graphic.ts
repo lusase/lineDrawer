@@ -154,6 +154,7 @@ export class Graphic {
     }
   }
   addDrawingListeners() {
+    this.onPathMouseDown = this.onPathMouseDown.bind(this)
     this.addDot = this.addDot.bind(this)
     this.rightClick = this.rightClick.bind(this)
     this.close = this.close.bind(this)
@@ -172,7 +173,6 @@ export class Graphic {
   }
 
   addClosedListeners() {
-    this.onPathMouseDown = this.onPathMouseDown.bind(this)
     this.onObjectMoving = this.onObjectMoving.bind(this)
     this.ctx.canvas.on('object:moving', this.onObjectMoving)
   }
@@ -189,7 +189,7 @@ export class Graphic {
 
   renderPath() {
     if (this.path) {
-      this.path.off('mouse:down', this.onPathMouseDown)
+      this.path.off('mousedown', this.onPathMouseDown)
       this.ctx.rmFCvs(this.path)
     }
     const dots = this.closed ? this.dots : [...this.dots, this.movePointer]
@@ -198,7 +198,7 @@ export class Graphic {
     this.path = new fabric.Path(pathStr, cfg)
     this.path.name = this.pathName
     this.path.data = {x: this.path.left, y: this.path.top, _graphic: this}
-    this.path.on('mouse:down', this.onPathMouseDown)
+    this.path.on('mousedown', this.onPathMouseDown)
     this.ctx.add2Cvs(this.path)
     this.path.sendToBack()
   }
