@@ -5,6 +5,7 @@ import {IEvent} from 'fabric/fabric-impl'
 
 type GraphicCfg = {
   id?: string
+  name?: string
 }
 
 const drawingCfg: fabric.IPathOptions = {
@@ -49,9 +50,18 @@ export class Graphic {
     public cfg: GraphicCfg = {}
   ) {
     this.id = cfg.id || Sketchpad.uuid()
+    this.name = cfg.name
     this.vertexName = 'vertex' + this.id
     this.pathName = 'path' + this.id
     this.addDrawingListeners()
+  }
+
+  getPath() {
+    const width = this.ctx.canvas.getWidth()
+    const height = this.ctx.canvas.getHeight()
+    return this.dots.map(dot => {
+      return {x: dot.x / width, y: dot.y / height}
+    })
   }
 
   isActive() {

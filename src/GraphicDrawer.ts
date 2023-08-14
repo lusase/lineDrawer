@@ -31,6 +31,21 @@ export class GraphicDrawer extends Sketchpad {
     }
     super.setConfig(config)
   }
+
+  getData() {
+    const graphics = [...this.graphicMap.values()].map(graph => {
+      return {
+        id: graph.id,
+        name: graph.name,
+        path: graph.getPath()
+      }
+    })
+    return {
+      drawType: this.drawType,
+      graphics
+    }
+  }
+
   async onKeydown(e: KeyboardEvent): Promise<void> {
     if (!this.config.editable) return
     if (e.code === 'Delete') {
