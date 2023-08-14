@@ -99,7 +99,10 @@ export class GraphicDrawer extends Sketchpad {
       this.currentGraphic.makeStartDot(this.canvas.getPointer(e.e))
     } else if(e.target.data?._graphic){
       const graphic = e.target.data._graphic as Graphic
-      if(this.currentGraphic.closed && graphic !== this.currentGraphic) {
+      if(
+        !this.currentGraphic
+        || (this.currentGraphic.closed && graphic !== this.currentGraphic)
+      ) {
         this.focus(graphic)
       }
     }
