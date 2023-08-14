@@ -6,6 +6,8 @@ import {IEvent} from 'fabric/fabric-impl'
 type GraphicCfg = {
   id?: string
   name?: string
+  closed?: boolean
+  dots?: fabric.IPoint[]
 }
 
 const drawingCfg: fabric.IPathOptions = {
@@ -13,7 +15,8 @@ const drawingCfg: fabric.IPathOptions = {
   strokeWidth: 1,
   fill: 'rgba(255, 255, 255, 0.75)',
   hasBorders: false,
-  hasControls: false
+  hasControls: false,
+  hoverCursor: 'crosshair'
 }
 
 const closedCfg: fabric.IPathOptions = {
@@ -35,6 +38,7 @@ const timeoutFn = (function useTimeout() {
 export class Graphic {
   id: string
   name?: string
+  fill = 'rgba(255, 255, 0, 0.75)'
   closed: boolean = false
   private active: boolean = true
   graph: fabric.Group
@@ -51,9 +55,18 @@ export class Graphic {
   ) {
     this.id = cfg.id || Sketchpad.uuid()
     this.name = cfg.name
+    this.closed = cfg.closed
     this.vertexName = 'vertex' + this.id
     this.pathName = 'path' + this.id
-    this.addDrawingListeners()
+    if (cfg.closed) {
+      this.addClosedListeners()
+    } else {
+      this.addDrawingListeners()
+    }
+    if (cfg.dots?.length) {
+      this.dots = cfg.dots
+      this.renderPath()
+    }
   }
 
   getPath() {
@@ -193,7 +206,9 @@ export class Graphic {
       this.ctx.rmFCvs(this.path)
     }
     const dots = this.closed ? this.dots : [...this.dots, this.movePointer]
-    const cfg = this.closed ? closedCfg : drawingCfg
+    const cfg = this.closed
+      ? {...closedCfg, fill: this.fill}
+      : drawingCfg
     const pathStr = this.ctx.getPathStr(dots)
     this.path = new fabric.Path(pathStr, cfg)
     this.path.name = this.pathName

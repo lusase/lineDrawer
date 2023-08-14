@@ -5,6 +5,15 @@ import {Graphic} from './Graphic'
 
 export type DrawType = 'polygon' | 'rectangle' | 'circle'
 
+export type DataType = {
+  drawType: DataType
+  graphics: {
+    id: string
+    name: string
+    path: {x: number, y: number}[]
+  }[]
+}
+
 export class GraphicDrawer extends Sketchpad {
   drawType: 'polygon' | 'rectangle' | 'circle' = 'polygon'
   currentGraphic: Graphic = null
@@ -32,6 +41,28 @@ export class GraphicDrawer extends Sketchpad {
     super.setConfig(config)
   }
 
+  cleanGraphics() {
+    this.graphicMap.forEach((g) => {
+      g.destroy()
+    })
+  }
+
+  addData(data: DataType) {
+    const width = this.canvas.getWidth()
+    const height = this.canvas.getHeight()
+    data.graphics.forEach(g => {
+      const graph = new Graphic(this, {
+        id: g.id,
+        name: g.name,
+        closed: true,
+        dots: g.path.map(p => ({
+          x: p.x * width,
+          y: p.y * height
+        }))
+      })
+      this.graphicMap.set(g.id, graph)
+    })
+  }
   getData() {
     const graphics = [...this.graphicMap.values()].map(graph => {
       return {
