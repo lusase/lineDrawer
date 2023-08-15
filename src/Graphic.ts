@@ -157,7 +157,7 @@ export class Graphic {
     this.renderPath()
   }
   onObjectMoving(e: fabric.IEvent<MouseEvent>) {
-    if (!this.active) return
+    if (!this.active || !this.ctx.config.editable) return
     if (e.target.name === this.vertexName) {
       const p = e.target.data as fabric.IPoint
       p.x = e.target.left
@@ -230,10 +230,10 @@ export class Graphic {
   }
   updateState() {
     if (this.ctx.config.editable) {
-      this.path.set({hoverCursor: 'move'})
+      this.path.set({hoverCursor: 'move', selectable: true})
       this.selected && this.unselect()
     } else {
-      this.path.set({hoverCursor: 'pointer'})
+      this.path.set({hoverCursor: 'pointer', selectable: false})
     }
   }
   renderPath() {
