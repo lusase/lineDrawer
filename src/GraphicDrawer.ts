@@ -27,7 +27,7 @@ export class GraphicDrawer extends Sketchpad {
     this.currentGraphic = null
     this.graphicMap.forEach(g => {
       g.isActive() && g.blur()
-      g.toReadonlyState()
+      g.updateState()
     })
     this.canvas.requestRenderAll()
   }
@@ -35,7 +35,7 @@ export class GraphicDrawer extends Sketchpad {
   toEditingState() {
     this.config.editable = true
     this.graphicMap.forEach(g => {
-      g.toEditingState()
+      g.updateState()
     })
     this.canvas.requestRenderAll()
   }
@@ -152,7 +152,7 @@ export class GraphicDrawer extends Sketchpad {
         !this.currentGraphic
         || (this.currentGraphic.closed && graphic !== this.currentGraphic)
       ) {
-        this.focus(graphic)
+        this.config.editable && this.focus(graphic)
       }
     }
   }

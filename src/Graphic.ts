@@ -62,6 +62,7 @@ export class Graphic {
     this.vertexName = 'vertex' + this.id
     this.pathName = 'path' + this.id
     this.fill = cfg.fill ?? closedCfg.fill as string
+    this.onPathMouseDown = this.onPathMouseDown.bind(this)
     if (cfg.closed) {
       this.addClosedListeners()
     } else {
@@ -71,6 +72,7 @@ export class Graphic {
       this.dots = cfg.dots
       this.renderPath()
     }
+    this.updateState()
   }
 
   getPath() {
@@ -175,7 +177,6 @@ export class Graphic {
     }
   }
   addDrawingListeners() {
-    this.onPathMouseDown = this.onPathMouseDown.bind(this)
     this.addDot = this.addDot.bind(this)
     this.rightClick = this.rightClick.bind(this)
     this.close = this.close.bind(this)
@@ -227,12 +228,13 @@ export class Graphic {
       data: {id: this.id, name: this.name}
     })
   }
-  toReadonlyState() {
-    this.path.set({hoverCursor: 'pointer'})
-  }
-  toEditingState() {
-    this.path.set({hoverCursor: 'move'})
-    this.selected && this.unselect()
+  updateState() {
+    if (this.ctx.config.editable) {
+      this.path.set({hoverCursor: 'move'})
+      this.selected && this.unselect()
+    } else {
+      this.path.set({hoverCursor: 'pointer'})
+    }
   }
   renderPath() {
     if (this.path) {
@@ -258,6 +260,7 @@ export class Graphic {
     this.removeClosedListeners()
   }
   focus() {
+    if (!this.ctx.config.editable) return
     this.active = true
     if (this.closed) this.addClosedListeners()
     this.renderVertexes()

@@ -50,13 +50,25 @@
   const drawer = new LineDrawer.GraphicDrawer('c', {
     lineStroke: '#fff',
     strokeWidth: 2,
-    editable: true,
+    editable: false,
     pathOpacity: 0.5,
     bgUrl: './bg.jpg',
     fill: '#1890ff',
-    fills: ['red', 'blue', 'yellow']
+    fills: ['red', 'blue', 'yellow'],
   })
+  drawer.addData(
+    {
+      drawType: 'polygon', graphics: [{
+        id: '1',
+        path: [{x: 0.1, y: 0.1}, {x: 0.1, y: 0.2}, {x: 0.2, y: 0.1}]
+      }, {
+        id: '2',
+        path: [{x: 0.2, y: 0.1}, {x: 0.3, y: 0.2}, {x: 0.5, y: 0.1}]
+      }]
+    }
+  )
   drawer.on('graph.click', e => console.log(e))
+
   function toggleEditable() {
     drawer.config.editable ? drawer.toReadonlyState() : drawer.toEditingState()
   }
