@@ -7,6 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
   <script src="https://cdn.bootcdn.net/ajax/libs/fabric.js/5.3.1/fabric.js"></script>
+  <script src="../node_modules/tinycolor2/tinycolor.js"></script>
 </head>
 <body>
 
@@ -42,6 +43,7 @@
 </div>
 <script>
   fabric.fabric = fabric
+  window.P$1 = tinycolor
 </script>
 <script src="../dist/linedrawer.js"></script>
 <script>
@@ -50,9 +52,14 @@
     strokeWidth: 2,
     editable: true,
     pathOpacity: 0.5,
-    bgUrl: './bg.jpg'
+    bgUrl: './bg.jpg',
+    fill: '#1890ff',
+    fills: ['red', 'blue', 'yellow']
   })
   drawer.on('graph.click', e => console.log(e))
+  function toggleEditable() {
+    drawer.config.editable ? drawer.toReadonlyState() : drawer.toEditingState()
+  }
 </script>
 
 <script>

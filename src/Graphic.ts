@@ -1,4 +1,5 @@
 import {fabric} from 'fabric'
+import tinyColor from 'tinycolor2'
 import {DrawType, GraphicDrawer} from './GraphicDrawer'
 import {Sketchpad} from './Sketchpad'
 import {IEvent} from 'fabric/fabric-impl'
@@ -7,6 +8,7 @@ type GraphicCfg = {
   id?: string
   name?: string
   closed?: boolean
+  fill?: string
   dots?: fabric.IPoint[]
 }
 
@@ -38,9 +40,10 @@ const timeoutFn = (function useTimeout() {
 export class Graphic {
   id: string
   name?: string
-  fill = 'rgba(255, 255, 0, 0.75)'
+  fill: string
   closed: boolean = false
   private active: boolean = true
+  private selected = false
   graph: fabric.Group
   path: fabric.Path
   movePointer: fabric.IPoint
@@ -58,6 +61,7 @@ export class Graphic {
     this.closed = cfg.closed
     this.vertexName = 'vertex' + this.id
     this.pathName = 'path' + this.id
+    this.fill = cfg.fill ?? closedCfg.fill as string
     if (cfg.closed) {
       this.addClosedListeners()
     } else {
@@ -79,6 +83,10 @@ export class Graphic {
 
   isActive() {
     return this.active
+  }
+
+  isSelected() {
+    return this.selected
   }
 
   makeStartDot(point: fabric.IPoint) {
@@ -192,14 +200,40 @@ export class Graphic {
   removeClosedListeners() {
     this.ctx.canvas.off('object:moving', this.onObjectMoving)
   }
-
+  private brighten() {
+    const fill = tinyColor(this.fill).darken().toString()
+    this.path.set({fill})
+  }
+  private recoverFill() {
+    this.path.set({fill: this.fill})
+  }
+  unselect() {
+    this.recoverFill()
+    this.selected = false
+  }
+  select() {
+    this.ctx.graphicMap.forEach((g) => {
+      g !== this && g.unselect()
+    })
+    this.brighten()
+    this.selected = true
+  }
   onPathMouseDown(e: IEvent<MouseEvent>) {
+    if (!this.ctx.config.editable) {
+      this.select()
+    }
     this.ctx.emit('graph.click', {
       target: this,
       data: {id: this.id, name: this.name}
     })
   }
-
+  toReadonlyState() {
+    this.path.set({hoverCursor: 'pointer'})
+  }
+  toEditingState() {
+    this.path.set({hoverCursor: 'move'})
+    this.selected && this.unselect()
+  }
   renderPath() {
     if (this.path) {
       this.path.off('mousedown', this.onPathMouseDown)

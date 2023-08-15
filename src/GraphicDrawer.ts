@@ -1,6 +1,6 @@
 import {IEvent} from 'fabric/fabric-impl'
 import {Sketchpad} from './Sketchpad'
-import {SketchConfig} from './type/drawer'
+import {GraphicDrawerConfig, SketchConfig} from './type/drawer'
 import {Graphic} from './Graphic'
 
 export type DrawType = 'polygon' | 'rectangle' | 'circle'
@@ -18,17 +18,26 @@ export class GraphicDrawer extends Sketchpad {
   drawType: DrawType = 'polygon'
   currentGraphic: Graphic = null
   graphicMap = new Map<string, Graphic>()
-  constructor(canvasId: string, public config: SketchConfig = {}) {
+  constructor(canvasId: string, public config: GraphicDrawerConfig = {}) {
     super(canvasId, config)
   }
 
   toReadonlyState() {
     this.config.editable = false
-    this.graphicMap.forEach(g => g.isActive() && g.blur())
+    this.currentGraphic = null
+    this.graphicMap.forEach(g => {
+      g.isActive() && g.blur()
+      g.toReadonlyState()
+    })
+    this.canvas.requestRenderAll()
   }
 
   toEditingState() {
     this.config.editable = true
+    this.graphicMap.forEach(g => {
+      g.toEditingState()
+    })
+    this.canvas.requestRenderAll()
   }
 
   setConfig(config: SketchConfig) {
@@ -46,7 +55,13 @@ export class GraphicDrawer extends Sketchpad {
       g.destroy()
     })
   }
-
+  private getFill() {
+    const {fills, fill} = this.config
+    if (fills?.length) {
+      return fills[this.graphicMap.size % fills.length]
+    }
+    return fill
+  }
   addData(data: DataType) {
     const width = this.canvas.getWidth()
     const height = this.canvas.getHeight()
@@ -55,6 +70,7 @@ export class GraphicDrawer extends Sketchpad {
         id: g.id,
         name: g.name,
         closed: true,
+        fill: this.getFill(),
         dots: g.path.map(p => ({
           x: p.x * width,
           y: p.y * height
@@ -125,7 +141,9 @@ export class GraphicDrawer extends Sketchpad {
       if (this.currentGraphic) {
         this.currentGraphic.blur()
       }
-      this.currentGraphic = new Graphic(this)
+      this.currentGraphic = new Graphic(this, {
+        fill: this.getFill()
+      })
       this.graphicMap.set(this.currentGraphic.id, this.currentGraphic)
       this.currentGraphic.makeStartDot(this.canvas.getPointer(e.e))
     } else if(e.target.data?._graphic){

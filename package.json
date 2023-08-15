@@ -1,6 +1,6 @@
 {
   "name": "linedrawer",
-  "version": "0.4.10",
+  "version": "0.4.11",
   "description": "lineDrawer base on fabric.js ",
   "main": "index.js",
   "type": "module",
@@ -31,6 +31,7 @@
     "@babel/parser": "^7.22.7",
     "@types/fabric": "^5.3.0",
     "@types/node": "^20.4.6",
+    "@types/tinycolor2": "^1.4.3",
     "esbuild": "^0.18.17",
     "execa": "^7.2.0",
     "rollup": "^3.27.0",
@@ -40,6 +41,7 @@
     "typescript": "^5.1.6"
   },
   "peerDependencies": {
-    "fabric": "^5.3.0"
+    "fabric": "^5.3.0",
+    "tinycolor2": "^1.6.0"
   }
 }

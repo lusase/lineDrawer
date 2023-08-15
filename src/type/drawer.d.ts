@@ -13,6 +13,11 @@ export interface SketchConfig {
   scalable?: boolean
 }
 
+export interface GraphicDrawerConfig extends SketchConfig {
+  fill?: string
+  fills?: string[]
+}
+
 export interface ArrowLine {
   id: string
   idx: number
