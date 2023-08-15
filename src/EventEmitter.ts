@@ -23,7 +23,7 @@ export class EventEmitter {
     return this
   }
 
-  off(type: string, listener?: () => void): EventEmitter {
+  off(type: string, listener?: (...args: any[]) => void): EventEmitter {
     if (!this._events[type]) return this
     if (!listener) delete this._events[type]
     const list = this._events[type]

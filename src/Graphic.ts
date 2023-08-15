@@ -232,8 +232,10 @@ export class Graphic {
     if (this.ctx.config.editable) {
       this.path.set({hoverCursor: 'move', selectable: true})
       this.selected && this.unselect()
+      this.active = true
     } else {
       this.path.set({hoverCursor: 'pointer', selectable: false})
+      this.active = false
     }
   }
   renderPath() {

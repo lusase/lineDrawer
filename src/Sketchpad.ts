@@ -102,7 +102,9 @@ export abstract class Sketchpad extends EventEmitter {
   setConfig(config: SketchConfig) {
     this.config = {...this.config, ...config}
   }
-
+  renderCanvas() {
+    this.canvas.renderAll()
+  }
   reload() {
     this.canvas.clear()
     this.initBg()
