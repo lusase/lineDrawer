@@ -42,7 +42,7 @@ export class Graphic {
   name?: string
   fill: string
   closed: boolean = false
-  private active: boolean = true
+  private active: boolean = false
   private selected = false
   graph: fabric.Group
   path: fabric.Path
@@ -112,6 +112,7 @@ export class Graphic {
     if (this.dots.length <= 2) {
       return this.destroy()
     }
+    this.active = true
     this.removeDrawingListeners()
     this.movePointer = null
     this.renderPath()
@@ -230,11 +231,10 @@ export class Graphic {
   }
   updateState() {
     if (this.ctx.config.editable) {
-      this.path.set({hoverCursor: 'move', selectable: true})
-      this.selected && this.unselect()
-      this.active = true
+      this.path?.set({hoverCursor: 'move', selectable: true})
+      this.path && this.selected && this.unselect()
     } else {
-      this.path.set({hoverCursor: 'pointer', selectable: false})
+      this.path?.set({hoverCursor: 'pointer', selectable: false})
       this.active = false
     }
   }
