@@ -47,7 +47,7 @@ export class EventEmitter {
       return handler.call(this, e)
     } else if (Array.isArray(handler)) {
       return handler.map(item => {
-        return item.call(this, e)
+        if (typeof item === 'function') return item.call(this, e)
       })
     } else {
       return false

@@ -18,7 +18,7 @@ export class GraphicDrawer extends Sketchpad {
   drawType: DrawType = 'polygon'
   currentGraphic: Graphic = null
   graphicMap = new Map<string, Graphic>()
-  constructor(canvasId: string, public config: GraphicDrawerConfig = {}) {
+  constructor(canvasId: string | HTMLCanvasElement, public config: GraphicDrawerConfig = {}) {
     super(canvasId, config)
   }
 

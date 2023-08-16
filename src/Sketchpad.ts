@@ -13,7 +13,7 @@ export abstract class Sketchpad extends EventEmitter {
     return Array.from({length: 8}, () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substr(1)).join('')
   }
   protected constructor(
-    canvasId: string,
+    canvasId: string | HTMLCanvasElement,
     public config: SketchConfig = {}
   ) {
     super()
