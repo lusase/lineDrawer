@@ -9,6 +9,7 @@ type GraphicCfg = {
   name?: string
   closed?: boolean
   fill?: string
+  group?: string
   dots?: fabric.IPoint[]
 }
 
@@ -41,6 +42,7 @@ export class Graphic {
   id: string
   name?: string
   fill: string
+  group: string
   closed: boolean = false
   private active: boolean = false
   private selected = false
@@ -62,6 +64,7 @@ export class Graphic {
     this.vertexName = 'vertex' + this.id
     this.pathName = 'path' + this.id
     this.fill = cfg.fill ?? closedCfg.fill as string
+    this.group = cfg.group ?? 'default'
     this.onPathMouseDown = this.onPathMouseDown.bind(this)
     if (cfg.closed) {
       this.addClosedListeners()
@@ -73,6 +76,22 @@ export class Graphic {
       this.renderPath()
     }
     this.updateState()
+  }
+  show() {
+    this.toggleVisible(true)
+  }
+
+  hide() {
+    this.toggleVisible(false)
+  }
+
+  private toggleVisible(visible: boolean) {
+    this.path.set({visible})
+    if (this.ctx.config.editable) {
+      this.vertexes.forEach(v => {
+        v.set({visible})
+      })
+    }
   }
 
   getPath() {

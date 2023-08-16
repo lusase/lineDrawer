@@ -7,6 +7,7 @@ export type DrawType = 'polygon' | 'rectangle' | 'circle'
 
 export type DataType = {
   drawType: DrawType
+  group?: string
   graphics: {
     id: string
     name: string
@@ -30,6 +31,20 @@ export class GraphicDrawer extends Sketchpad {
       g.updateState()
     })
     this.canvas.requestRenderAll()
+  }
+
+  showGraphics(...groups: string[]) {
+    this.graphicMap.forEach(g => {
+      if (groups.length && !groups.includes(g.group)) return
+      g.show()
+    })
+  }
+
+  hideGraphics(...groups: string[]) {
+    this.graphicMap.forEach(g => {
+      if (groups.length && !groups.includes(g.group)) return
+      g.hide()
+    })
   }
 
   toEditingState() {
@@ -71,6 +86,7 @@ export class GraphicDrawer extends Sketchpad {
         name: g.name,
         closed: true,
         fill: this.getFill(),
+        group: data.group,
         dots: g.path.map(p => ({
           x: p.x * width,
           y: p.y * height
