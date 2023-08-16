@@ -34,17 +34,19 @@ export class GraphicDrawer extends Sketchpad {
   }
 
   showGraphics(...groups: string[]) {
-    this.graphicMap.forEach(g => {
-      if (groups.length && !groups.includes(g.group)) return
-      g.show()
-    })
+    this.toggleGraphicsVisible(true, ...groups)
   }
 
   hideGraphics(...groups: string[]) {
+    this.toggleGraphicsVisible(false, ...groups)
+  }
+
+  private toggleGraphicsVisible(visible: boolean, ...groups: string[]) {
     this.graphicMap.forEach(g => {
       if (groups.length && !groups.includes(g.group)) return
-      g.hide()
+      visible ? g.show() : g.hide()
     })
+    this.canvas.requestRenderAll()
   }
 
   toEditingState() {
