@@ -10,7 +10,8 @@ export const defCfg: SketchConfig = {
   pathOpacity: 1,
   alwaysShowTip: false,
   bgUrl: '',
-  scalable: true
+  scalable: true,
+  ctlSize: 6
 }
 
 export function mergeDefault(src: Record<string, unknown> | {}, def: Record<string, unknown> | {}) {

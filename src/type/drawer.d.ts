@@ -11,6 +11,7 @@ export interface SketchConfig {
   alwaysShowTip?: boolean
   bgUrl?: string
   scalable?: boolean
+  ctlSize?: number
 }
 
 export interface GraphicDrawerConfig extends SketchConfig {

@@ -202,13 +202,15 @@ export abstract class Sketchpad extends EventEmitter {
       top: pointer.y,
       originX: 'center',
       originY: 'center',
-      radius: 5,
+      radius: this.config.ctlSize,
       strokeWidth: 2,
-      fill: '#0018ff',
-      stroke: '#f0f0f0',
+      fill: '#0018ff88',
+      stroke: '#f0f0f088',
       evented: this.config.editable,
       hasBorders: false,
-      hasControls: false
+      hasControls: false,
+      hoverCursor: 'pointer',
+      moveCursor: 'pointer'
     })
     return dot
   }
