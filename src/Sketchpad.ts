@@ -93,10 +93,10 @@ export abstract class Sketchpad extends EventEmitter {
   }
 
   recover() {
-    this.canvas.setZoom(1)
     const vpt = this.canvas.viewportTransform
     vpt[4] = 0
     vpt[5] = 0
+    this.canvas.setZoom(1)
   }
 
   setConfig(config: SketchConfig) {

@@ -33,6 +33,7 @@
 <button style="margin-top: 30px" onclick="delCurrentLine()">删除选中的线条</button>
 <button style="margin-top: 30px" onclick="saveCanvas()">保存</button>
 <button style="margin-top: 30px" onClick="toggleEditable()">可拖动/不可拖动</button>
+<button style="margin-top: 30px" onClick="toggleRecover()">恢复</button>
 <div>
   颜色 <input id="color">
   <button onclick="setLineColor()">保存颜色</button>
@@ -43,14 +44,14 @@
 </div>
 <script>
   fabric.fabric = fabric
-  window.P$1 = tinycolor
+  window.P = tinycolor
 </script>
 <script src="../dist/linedrawer.js"></script>
 <script>
   const drawer = new LineDrawer.GraphicDrawer('c', {
     lineStroke: '#fff',
     strokeWidth: 2,
-    editable: false,
+    editable: true,
     pathOpacity: 0.5,
     bgUrl: './bg.jpg',
     fill: '#1890ff',
@@ -71,6 +72,9 @@
 
   function toggleEditable() {
     drawer.config.editable ? drawer.toReadonlyState() : drawer.toEditingState()
+  }
+  function toggleRecover() {
+    drawer.recover()
   }
 </script>
 
