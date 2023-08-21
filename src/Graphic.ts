@@ -176,6 +176,11 @@ export class Graphic {
     this.movePointer = this.ctx.canvas.getPointer(e.e)
     this.renderPath()
   }
+  onKeydown(e: KeyboardEvent) {
+    if (e.code === 'Escape' && !this.closed) {
+      this.close()
+    }
+  }
   onObjectMoving(e: fabric.IEvent<MouseEvent>) {
     if (!this.active || !this.ctx.config.editable) return
     if (e.target.name === this.vertexName) {
@@ -205,6 +210,7 @@ export class Graphic {
     this.ctx.canvas.on('mouse:down:before', this.rightClick)
     this.ctx.canvas.on('mouse:dblclick', this.close)
     this.ctx.canvas.on('mouse:move', this.onMove)
+    window.addEventListener('keydown', this.onKeydown)
   }
 
   removeDrawingListeners() {
@@ -212,6 +218,7 @@ export class Graphic {
     this.ctx.canvas.off('mouse:move', this.onMove)
     this.ctx.canvas.off('mouse:down:before', this.rightClick)
     this.ctx.canvas.off('mouse:dblclick', this.close)
+    window.removeEventListener('keydown', this.onKeydown)
   }
 
   addClosedListeners() {
