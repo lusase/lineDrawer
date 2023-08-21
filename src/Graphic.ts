@@ -65,7 +65,7 @@ export class Graphic {
     this.pathName = 'path' + this.id
     this.fill = cfg.fill ?? closedCfg.fill as string
     this.group = cfg.group ?? 'default'
-    this.onPathMouseDown = this.onPathMouseDown.bind(this)
+    this.bindMethods()
     if (cfg.closed) {
       this.addClosedListeners()
     } else {
@@ -76,6 +76,13 @@ export class Graphic {
       this.renderPath()
     }
     this.updateState()
+  }
+  private bindMethods() {
+    Reflect.ownKeys(Graphic.prototype).forEach(key => {
+      if (typeof this[key] === 'function' && key !== 'constructor') {
+        this[key] = this[key].bind(this)
+      }
+    })
   }
   show() {
     this.toggleVisible(true)
@@ -202,10 +209,6 @@ export class Graphic {
     }
   }
   addDrawingListeners() {
-    this.addDot = this.addDot.bind(this)
-    this.rightClick = this.rightClick.bind(this)
-    this.close = this.close.bind(this)
-    this.onMove = this.onMove.bind(this)
     this.ctx.canvas.on('mouse:down', this.addDot)
     this.ctx.canvas.on('mouse:down:before', this.rightClick)
     this.ctx.canvas.on('mouse:dblclick', this.close)
@@ -222,7 +225,6 @@ export class Graphic {
   }
 
   addClosedListeners() {
-    this.onObjectMoving = this.onObjectMoving.bind(this)
     this.ctx.canvas.on('object:moving', this.onObjectMoving)
   }
   removeClosedListeners() {
