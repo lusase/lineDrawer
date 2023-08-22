@@ -78,11 +78,13 @@ export class Graphic {
     this.updateState()
   }
   private bindMethods() {
-    Reflect.ownKeys(Graphic.prototype).forEach(key => {
-      if (typeof this[key] === 'function' && key !== 'constructor') {
-        this[key] = this[key].bind(this)
-      }
-    })
+    this.rightClick = this.rightClick.bind(this)
+    this.close = this.close.bind(this)
+    this.addDot = this.addDot.bind(this)
+    this.onMove = this.onMove.bind(this)
+    this.onKeydown = this.onKeydown.bind(this)
+    this.onObjectMoving = this.onObjectMoving.bind(this)
+    this.onPathMouseDown = this.onPathMouseDown.bind(this)
   }
   show() {
     this.toggleVisible(true)
@@ -249,6 +251,7 @@ export class Graphic {
     this.selected = true
   }
   onPathMouseDown(e: IEvent<MouseEvent>) {
+    if (e.target !== this.path) return
     if (!this.ctx.config.editable) {
       this.select()
     }
@@ -281,7 +284,12 @@ export class Graphic {
     this.path.data = {x: this.path.left, y: this.path.top, _graphic: this}
     this.path.on('mousedown', this.onPathMouseDown)
     this.ctx.add2Cvs(this.path)
-    this.path.sendToBack()
+    this.bringPathToFront()
+  }
+
+  private bringPathToFront() {
+    const index = this.ctx.canvas.getObjects().length - this.vertexes.length - 1
+    this.path.moveTo(index)
   }
 
   blur() {
@@ -294,6 +302,7 @@ export class Graphic {
     this.active = true
     if (this.closed) this.addClosedListeners()
     this.renderVertexes()
+    this.bringPathToFront()
   }
 
   destroy() {

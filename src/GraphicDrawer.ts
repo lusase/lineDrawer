@@ -164,7 +164,8 @@ export class GraphicDrawer extends Sketchpad {
       })
       this.graphicMap.set(this.currentGraphic.id, this.currentGraphic)
       this.currentGraphic.makeStartDot(this.canvas.getPointer(e.e))
-    } else if(e.target.data?._graphic){
+    // 点到了graph上
+    } else if (e.target.data?._graphic){
       const graphic = e.target.data._graphic as Graphic
       if(
         !this.currentGraphic
