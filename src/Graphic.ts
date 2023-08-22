@@ -60,7 +60,7 @@ export class Graphic {
   ) {
     this.id = cfg.id || Sketchpad.uuid()
     this.name = cfg.name
-    this.closed = cfg.closed
+    this.closed = cfg.closed ?? false
     this.vertexName = 'vertex' + this.id
     this.pathName = 'path' + this.id
     this.fill = cfg.fill ?? closedCfg.fill as string
@@ -251,7 +251,7 @@ export class Graphic {
     this.selected = true
   }
   onPathMouseDown(e: IEvent<MouseEvent>) {
-    if (e.target !== this.path) return
+    if (!this.closed || e.target !== this.path) return
     if (!this.ctx.config.editable) {
       this.select()
     }
