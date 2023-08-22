@@ -138,7 +138,7 @@ export abstract class Sketchpad extends EventEmitter {
     let zoom = this.canvas.getZoom()
     zoom *= 0.999 ** delta
     if (zoom > 20) zoom = 20
-    if (zoom < 0.01) zoom = 0.01
+    if (zoom < 0.6) zoom = 0.6
     this.canvas.zoomToPoint({x, y}, zoom)
     e.e.preventDefault()
     e.e.stopPropagation()
