@@ -316,7 +316,7 @@ export class Graphic {
     this.removeClosedListeners()
     this.removeDrawingListeners()
     this.ctx.graphicMap.delete(this.id)
-    if (this.ctx.currentGraphic === this) {
+    if (this.ctx.currentGraphic?.id === this.id) {
       this.ctx.currentGraphic = null
     }
   }
