@@ -113,7 +113,7 @@ export class GraphicDrawer extends Sketchpad {
 
   async onKeydown(e: KeyboardEvent): Promise<void> {
     if (!this.config.editable) return
-    if (e.code === 'Delete') {
+    if (e.code === 'Delete' && this.currentGraphic) {
       await (this.emit('graph.beforeDel', {}) as Promise<unknown>)
       const {id, name} = this.currentGraphic
       this.currentGraphic?.destroy()
