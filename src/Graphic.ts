@@ -234,10 +234,16 @@ export class Graphic {
   }
   private brighten() {
     const fill = tinyColor(this.fill).darken().toString()
-    this.path.set({fill})
+    const shadow = new fabric.Shadow({
+      color: this.fill,
+      blur: 6,
+      offsetX: 0,
+      offsetY: 0,
+    })
+    this.path.set({fill, shadow})
   }
   private recoverFill() {
-    this.path.set({fill: this.fill})
+    this.path.set({fill: this.fill, shadow: null})
   }
   unselect() {
     this.recoverFill()
