@@ -38,7 +38,7 @@ const timeoutFn = (function useTimeout() {
 })()
 
 
-export class Graphic {
+export class Graphic<T> {
   id: string
   name?: string
   fill: string
@@ -54,7 +54,8 @@ export class Graphic {
   vertexes: fabric.Object[] = []
   vertexName: string
   pathName: string
-  data?: unknown
+  // 用作携带数据
+  data?: T
   constructor(
     public ctx: GraphicDrawer,
     public cfg: GraphicCfg = {}
