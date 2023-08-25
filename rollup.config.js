@@ -4,7 +4,7 @@ import esbuild from 'rollup-plugin-esbuild'
 import dts from 'rollup-plugin-dts'
 export default defineConfig([{
   input: 'src/index.ts',
-  external: ['fabric'],
+  external: ['fabric', 'tinycolor2'],
   plugins: [
     esbuild({
       tsconfig: './tsconfig.json',
@@ -16,7 +16,11 @@ export default defineConfig([{
   output: [{
     name: 'LineDrawer',
     file: 'dist/linedrawer.js',
-    format: 'umd'
+    format: 'umd',
+    globals: {
+      fabric:  'fabric',
+      tinycolor2: 'tinycolor'
+    }
   }, {
     name: 'LineDrawer',
     file: 'dist/linedrawer.esm.js',

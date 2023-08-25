@@ -38,7 +38,7 @@ const timeoutFn = (function useTimeout() {
 })()
 
 
-export class Graphic<T> {
+export class Graphic<T = any> {
   id: string
   name?: string
   fill: string
