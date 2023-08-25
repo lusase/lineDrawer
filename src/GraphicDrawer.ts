@@ -5,9 +5,10 @@ import {Graphic} from './Graphic'
 
 export type DrawType = 'polygon' | 'rectangle' | 'circle'
 
-export type DataType = {
+export interface DataType<T = any> {
   drawType: DrawType
   group?: string
+  data?: T,
   graphics: {
     id: string
     name: string
@@ -15,10 +16,10 @@ export type DataType = {
   }[]
 }
 
-export class GraphicDrawer extends Sketchpad {
+export class GraphicDrawer<GDATA = any> extends Sketchpad {
   drawType: DrawType = 'polygon'
-  currentGraphic: Graphic = null
-  graphicMap = new Map<string, Graphic>()
+  currentGraphic: Graphic<GDATA> = null
+  graphicMap = new Map<string, Graphic<GDATA>>()
   constructor(canvasId: string | HTMLCanvasElement, public config: GraphicDrawerConfig = {}) {
     super(canvasId, config)
   }
@@ -79,11 +80,11 @@ export class GraphicDrawer extends Sketchpad {
     }
     return fill
   }
-  addData(data: DataType) {
+  addData(data: DataType<GDATA>) {
     const width = this.canvas.getWidth()
     const height = this.canvas.getHeight()
     data.graphics.forEach(g => {
-      const graph = new Graphic(this, {
+      const graph = new Graphic<GDATA>(this, {
         id: g.id,
         name: g.name,
         closed: true,
@@ -94,6 +95,7 @@ export class GraphicDrawer extends Sketchpad {
           y: p.y * height
         }))
       })
+      graph.data = data.data
       this.graphicMap.set(g.id, graph)
     })
   }
@@ -143,7 +145,7 @@ export class GraphicDrawer extends Sketchpad {
   onObjectMoving(e: IEvent<MouseEvent>): void {
   }
 
-  focus(graph: Graphic) {
+  focus(graph: Graphic<GDATA>) {
     if (!graph) return
     if (this.currentGraphic === graph) {
       return graph.focus()
@@ -159,7 +161,7 @@ export class GraphicDrawer extends Sketchpad {
       if (this.currentGraphic) {
         this.currentGraphic.blur()
       }
-      this.currentGraphic = new Graphic(this, {
+      this.currentGraphic = new Graphic<GDATA>(this, {
         fill: this.getFill()
       })
       this.graphicMap.set(this.currentGraphic.id, this.currentGraphic)
