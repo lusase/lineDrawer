@@ -54,6 +54,7 @@ export class Graphic {
   vertexes: fabric.Object[] = []
   vertexName: string
   pathName: string
+  data?: unknown
   constructor(
     public ctx: GraphicDrawer,
     public cfg: GraphicCfg = {}
