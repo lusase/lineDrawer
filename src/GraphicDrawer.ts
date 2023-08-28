@@ -8,10 +8,10 @@ export type DrawType = 'polygon' | 'rectangle' | 'circle'
 export interface DataType<T = any> {
   drawType: DrawType
   group?: string
-  data?: T,
   graphics: {
     id: string
     name: string
+    data?: T
     path: {x: number, y: number}[]
   }[]
 }
@@ -95,7 +95,7 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
           y: p.y * height
         }))
       })
-      graph.data = data.data
+      graph.data = g.data
       this.graphicMap.set(g.id, graph)
     })
   }
@@ -104,7 +104,8 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
       return {
         id: graph.id,
         name: graph.name,
-        path: graph.getPath()
+        path: graph.getPath(),
+        data: graph.data
       }
     })
     return {
