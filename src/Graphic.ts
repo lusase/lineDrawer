@@ -315,7 +315,7 @@ export class Graphic<T = any> {
 
   renderText() {
     const {textStyle} = this.ctx.config
-    if (!textStyle.show || !this.name) return
+    if (!textStyle.show || !this.name || !this.path) return
     const center = this.path.getCenterPoint()
     this.text = new fabric.Text(this.name, {
       ...textCfg,
