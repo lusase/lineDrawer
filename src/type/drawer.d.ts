@@ -23,6 +23,8 @@ export interface SketchConfig {
     stroke?: string | undefined
     shadow?: fabric.Shadow | string | undefined
     charSpacing?: number | undefined
+    strokeWidth?: number
+    fill?: string
   }
 }
 
