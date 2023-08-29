@@ -46,7 +46,7 @@ const timeoutFn = (function useTimeout() {
 
 export class Graphic<T = any> {
   id: string
-  __name: string
+  private __name: string
   fill: string
   group: string
   closed: boolean = false
