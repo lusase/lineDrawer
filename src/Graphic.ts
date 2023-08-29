@@ -46,7 +46,7 @@ const timeoutFn = (function useTimeout() {
 
 export class Graphic<T = any> {
   id: string
-  name?: string
+  #name: string
   fill: string
   group: string
   closed: boolean = false
@@ -63,6 +63,13 @@ export class Graphic<T = any> {
   text: fabric.Text
   // 用作携带数据
   data?: T
+  get name() {
+    return this.#name
+  }
+  set name(name: string) {
+    this.#name = name
+    this.updateTextContent()
+  }
   constructor(
     public ctx: GraphicDrawer,
     public cfg: GraphicCfg = {}
@@ -320,8 +327,16 @@ export class Graphic<T = any> {
     this.ctx.add2Cvs(this.text)
   }
 
+  updateTextContent() {
+    if (!this.text) return
+    this.text.set({
+      text: this.name
+    })
+    this.ctx.canvas.requestRenderAll()
+  }
+
   updateTextPos() {
-    if (!this.text?.visible) return
+    if (!this.text) return
     const center = this.path.getCenterPoint()
     this.text.set({
       left: center.x,

@@ -24,7 +24,7 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
     super(canvasId, config)
   }
 
-  toReadonlyState() {
+  private toReadonlyState() {
     this.currentGraphic = null
     this.graphicMap.forEach(g => {
       g.isActive() && g.blur()
@@ -49,14 +49,14 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
     this.canvas.requestRenderAll()
   }
 
-  toEditingState() {
+  private toEditingState() {
     this.graphicMap.forEach(g => {
       g.updateState()
     })
     this.canvas.requestRenderAll()
   }
 
-  setConfig(config: SketchConfig) {
+  setConfig(config: GraphicDrawerConfig) {
     super.setConfig(config)
   }
 
@@ -175,12 +175,11 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
     this.graphicMap.forEach(graph => {
       graph.updateTextStyle()
     })
-    this.canvas.renderAll()
+    this.canvas.requestRenderAll()
   }
 
   configSetHandler(target: GraphicDrawerConfig, p: keyof GraphicDrawerConfig, newValue: GraphicDrawerConfig[typeof p], receiver: any): boolean {
     Reflect.set(target, p, newValue)
-    console.log(444, p, newValue)
     switch (p) {
       case 'editable':
         newValue ? this.toEditingState() : this.toReadonlyState()

@@ -111,6 +111,11 @@ export abstract class Sketchpad extends EventEmitter {
       }
     })
   }
+
+  resetConfig() {
+    this.setConfig(defCfg)
+  }
+
   renderCanvas() {
     this.canvas.renderAll()
   }
