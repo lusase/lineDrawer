@@ -315,14 +315,13 @@ export class Graphic<T = any> {
 
   renderText() {
     const {textStyle} = this.ctx.config
-    if (!textStyle.show || !this.name || !this.path) return
+    if (!textStyle.visible || !this.name || !this.path) return
     const center = this.path.getCenterPoint()
     this.text = new fabric.Text(this.name, {
       ...textCfg,
       left: center.x,
       top: center.y,
-      fontSize: textStyle.fontSize,
-      stroke: textStyle.color
+      ...textStyle
     })
     this.ctx.add2Cvs(this.text)
   }
@@ -380,10 +379,6 @@ export class Graphic<T = any> {
   updateTextStyle() {
     if (!this.text) return
     const {textStyle} = this.ctx.config
-    this.text.set({
-      visible: textStyle.show,
-      stroke: textStyle.color,
-      fontSize: textStyle.fontSize
-    })
+    this.text.set(textStyle)
   }
 }

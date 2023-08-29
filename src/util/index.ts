@@ -13,9 +13,9 @@ export const defCfg: SketchConfig = {
   scalable: true,
   ctlSize: 6,
   textStyle: {
-    show: false,
+    visible: false,
     fontSize: 12,
-    color: '#ccc'
+    stroke: '#ccc'
   }
 }
 
