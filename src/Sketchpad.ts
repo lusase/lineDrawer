@@ -1,7 +1,7 @@
 import {fabric} from 'fabric'
 import {EventEmitter} from './EventEmitter'
 import {SketchConfig} from './type/drawer'
-import {defCfg, mergeDefault} from './util'
+import {defCfg, merge} from './util'
 
 
 export abstract class Sketchpad extends EventEmitter {
@@ -17,7 +17,9 @@ export abstract class Sketchpad extends EventEmitter {
     public config: SketchConfig = {}
   ) {
     super()
-    mergeDefault(config, defCfg)
+    this.config = new Proxy(merge({}, defCfg, config), {
+      set: this.configSetHandler.bind(this)
+    })
     this.canvas = new fabric.Canvas(canvasId, {
       selection: false,
       preserveObjectStacking: true
@@ -26,6 +28,7 @@ export abstract class Sketchpad extends EventEmitter {
     this.initHandlers()
     this.initListeners()
   }
+  abstract configSetHandler(target: any, p: string | symbol, newValue: any, receiver: any): boolean
   initBg() {
     if (!this.config.bgUrl) return
     this.canvas.setBackgroundImage(
@@ -100,7 +103,13 @@ export abstract class Sketchpad extends EventEmitter {
   }
 
   setConfig(config: SketchConfig) {
-    this.config = {...this.config, ...config}
+    Reflect.ownKeys(config).forEach(key => {
+      if (typeof config[key] !== 'object' || config[key] === null) {
+        this.config[key] = config[key]
+      } else {
+        this.config[key] = merge(this.config[key], config[key])
+      }
+    })
   }
   renderCanvas() {
     this.canvas.renderAll()

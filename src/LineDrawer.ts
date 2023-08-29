@@ -341,4 +341,8 @@ export class LineDrawer extends Sketchpad {
     this.emit('add.dot', c)
     return c
   }
+
+  configSetHandler(target: any, p: string | symbol, newValue: any, receiver: any): boolean {
+    return false
+  }
 }

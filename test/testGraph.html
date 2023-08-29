@@ -44,7 +44,7 @@
 </div>
 <script>
   fabric.fabric = fabric
-  window.w$1 = tinycolor
+  // window.w$1 = tinycolor
 </script>
 <script src="../dist/linedrawer.js"></script>
 <script>
@@ -56,14 +56,19 @@
     bgUrl: './bg.jpg',
     fill: '#1890ff',
     fills: ['red', 'blue', 'yellow'],
+    textStyle: {
+      show: true
+    }
   })
   drawer.addData(
     {
       drawType: 'polygon', graphics: [{
         id: '1',
+        name: '你好, Tom',
         path: [{x: 0.1, y: 0.1}, {x: 0.1, y: 0.2}, {x: 0.2, y: 0.1}]
       }, {
         id: '2',
+        name: '名字特别的长, 躲到树后面也会被发现',
         path: [{x: 0.2, y: 0.1}, {x: 0.3, y: 0.2}, {x: 0.5, y: 0.1}]
       }]
     }
@@ -71,7 +76,9 @@
   drawer.on('graph.click', e => console.log(e))
 
   function toggleEditable() {
-    drawer.config.editable ? drawer.toReadonlyState() : drawer.toEditingState()
+    drawer.setConfig({
+      editable: !drawer.config.editable
+    })
   }
   function toggleRecover() {
     drawer.recover()

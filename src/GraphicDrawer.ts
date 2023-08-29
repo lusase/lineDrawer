@@ -1,4 +1,4 @@
-import {IEvent} from 'fabric/fabric-impl'
+import {fabric} from 'fabric'
 import {Sketchpad} from './Sketchpad'
 import {GraphicDrawerConfig, SketchConfig} from './type/drawer'
 import {Graphic} from './Graphic'
@@ -20,12 +20,11 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
   drawType: DrawType = 'polygon'
   currentGraphic: Graphic<GDATA> = null
   graphicMap = new Map<string, Graphic<GDATA>>()
-  constructor(canvasId: string | HTMLCanvasElement, public config: GraphicDrawerConfig = {}) {
+  constructor(canvasId: string | HTMLCanvasElement, config: GraphicDrawerConfig = {}) {
     super(canvasId, config)
   }
 
   toReadonlyState() {
-    this.config.editable = false
     this.currentGraphic = null
     this.graphicMap.forEach(g => {
       g.isActive() && g.blur()
@@ -51,7 +50,6 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
   }
 
   toEditingState() {
-    this.config.editable = true
     this.graphicMap.forEach(g => {
       g.updateState()
     })
@@ -59,12 +57,6 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
   }
 
   setConfig(config: SketchConfig) {
-    const {editable} = this.config
-    if (editable && !config.editable) {
-      this.toReadonlyState()
-    } else if (!editable && config.editable) {
-      this.toEditingState()
-    }
     super.setConfig(config)
   }
 
@@ -74,7 +66,7 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
     })
   }
   private getFill() {
-    const {fills, fill} = this.config
+    const {fills, fill} = this.config as GraphicDrawerConfig
     if (fills?.length) {
       return fills[this.graphicMap.size % fills.length]
     }
@@ -126,7 +118,7 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
     }
   }
 
-  onMouseDown(e: IEvent<MouseEvent>): void {
+  onMouseDown(e: fabric.IEvent<MouseEvent>): void {
     if (!this.config.editable) return
     switch (this.drawType) {
       case 'polygon':
@@ -134,16 +126,16 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
     }
   }
 
-  onMouseMove(e: IEvent<MouseEvent>): void {
+  onMouseMove(e: fabric.IEvent<MouseEvent>): void {
   }
 
-  onMouseOut(e: IEvent<MouseEvent>): void {
+  onMouseOut(e: fabric.IEvent<MouseEvent>): void {
   }
 
-  onMouseOver(e: IEvent<MouseEvent>): void {
+  onMouseOver(e: fabric.IEvent<MouseEvent>): void {
   }
 
-  onObjectMoving(e: IEvent<MouseEvent>): void {
+  onObjectMoving(e: fabric.IEvent<MouseEvent>): void {
   }
 
   focus(graph: Graphic<GDATA>) {
@@ -156,7 +148,7 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
     this.currentGraphic.focus()
   }
 
-  private polygonMouseDown(e: IEvent<MouseEvent>) {
+  private polygonMouseDown(e: fabric.IEvent<MouseEvent>) {
     // 点到了空白区域
     if(!e.target) {
       if (this.currentGraphic) {
@@ -177,5 +169,26 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
         this.config.editable && this.focus(graphic)
       }
     }
+  }
+
+  private updateTextStyle() {
+    this.graphicMap.forEach(graph => {
+      graph.updateTextStyle()
+    })
+    this.canvas.renderAll()
+  }
+
+  configSetHandler(target: GraphicDrawerConfig, p: keyof GraphicDrawerConfig, newValue: GraphicDrawerConfig[typeof p], receiver: any): boolean {
+    Reflect.set(target, p, newValue)
+    console.log(444, p, newValue)
+    switch (p) {
+      case 'editable':
+        newValue ? this.toEditingState() : this.toReadonlyState()
+        break
+      case 'textStyle':
+        this.updateTextStyle()
+        break
+    }
+    return true
   }
 }

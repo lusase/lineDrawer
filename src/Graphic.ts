@@ -2,7 +2,6 @@ import {fabric} from 'fabric'
 import tinyColor from 'tinycolor2'
 import {DrawType, GraphicDrawer} from './GraphicDrawer'
 import {Sketchpad} from './Sketchpad'
-import {IEvent} from 'fabric/fabric-impl'
 
 type GraphicCfg = {
   id?: string
@@ -27,6 +26,13 @@ const closedCfg: fabric.IPathOptions = {
   hasBorders: false,
   hasControls: false,
   perPixelTargetFind: true
+}
+
+const textCfg: fabric.TextOptions = {
+  evented: false,
+  textAlign: 'center',
+  originX: 'center',
+  originY: 'center'
 }
 
 const timeoutFn = (function useTimeout() {
@@ -54,6 +60,7 @@ export class Graphic<T = any> {
   vertexes: fabric.Object[] = []
   vertexName: string
   pathName: string
+  text: fabric.Text
   // 用作携带数据
   data?: T
   constructor(
@@ -76,6 +83,7 @@ export class Graphic<T = any> {
     if (cfg.dots?.length) {
       this.dots = cfg.dots
       this.renderPath()
+      this.renderText()
     }
     this.updateState()
   }
@@ -98,6 +106,7 @@ export class Graphic<T = any> {
 
   private toggleVisible(visible: boolean) {
     this.path.set({visible})
+    this.text?.set({visible})
     if (this.ctx.config.editable) {
       this.vertexes.forEach(v => {
         v.set({visible})
@@ -199,6 +208,7 @@ export class Graphic<T = any> {
       p.x = e.target.left
       p.y = e.target.top
       this.renderPath()
+      this.updateTextPos()
     } else if (e.target.name === this.pathName) {
       const path = e.target as fabric.Path
       const {x, y} = path.data as fabric.IPoint
@@ -209,6 +219,7 @@ export class Graphic<T = any> {
         dot.y -= offsetY
       })
       this.renderVertexes()
+      this.updateTextPos()
       path.data = {x: path.left, y: path.top, _graphic: this}
     }
   }
@@ -258,7 +269,7 @@ export class Graphic<T = any> {
     this.brighten()
     this.selected = true
   }
-  onPathMouseDown(e: IEvent<MouseEvent>) {
+  onPathMouseDown(e: fabric.IEvent<MouseEvent>) {
     if (!this.closed || e.target !== this.path) return
     if (!this.ctx.config.editable) {
       this.select()
@@ -295,9 +306,35 @@ export class Graphic<T = any> {
     this.bringPathToFront()
   }
 
+  renderText() {
+    const {textStyle} = this.ctx.config
+    if (!textStyle.show || !this.name) return
+    const center = this.path.getCenterPoint()
+    this.text = new fabric.Text(this.name, {
+      ...textCfg,
+      left: center.x,
+      top: center.y,
+      fontSize: textStyle.fontSize,
+      stroke: textStyle.color
+    })
+    this.ctx.add2Cvs(this.text)
+  }
+
+  updateTextPos() {
+    if (!this.text?.visible) return
+    const center = this.path.getCenterPoint()
+    this.text.set({
+      left: center.x,
+      top: center.y,
+    })
+  }
+
   private bringPathToFront() {
-    const index = this.ctx.canvas.getObjects().length - this.vertexes.length - 1
+    let index = this.ctx.canvas.getObjects().length - this.vertexes.length - 1
     this.path.moveTo(index)
+    if (this.text?.visible) {
+      this.text.moveTo(index)
+    }
   }
 
   blur() {
@@ -321,5 +358,15 @@ export class Graphic<T = any> {
     if (this.ctx.currentGraphic?.id === this.id) {
       this.ctx.currentGraphic = null
     }
+  }
+
+  updateTextStyle() {
+    if (!this.text) return
+    const {textStyle} = this.ctx.config
+    this.text.set({
+      visible: textStyle.show,
+      stroke: textStyle.color,
+      fontSize: textStyle.fontSize
+    })
   }
 }

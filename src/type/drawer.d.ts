@@ -12,6 +12,11 @@ export interface SketchConfig {
   bgUrl?: string
   scalable?: boolean
   ctlSize?: number
+  textStyle?: {
+    show?: boolean
+    color?: string
+    fontSize?: number
+  }
 }
 
 export interface GraphicDrawerConfig extends SketchConfig {
