@@ -46,7 +46,7 @@ const timeoutFn = (function useTimeout() {
 
 export class Graphic<T = any> {
   id: string
-  #name: string
+  __name: string
   fill: string
   group: string
   closed: boolean = false
@@ -64,10 +64,10 @@ export class Graphic<T = any> {
   // 用作携带数据
   data?: T
   get name() {
-    return this.#name
+    return this.__name
   }
   set name(name: string) {
-    this.#name = name
+    this.__name = name
     this.updateTextContent()
   }
   constructor(
