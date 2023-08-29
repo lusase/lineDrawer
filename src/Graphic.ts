@@ -328,7 +328,7 @@ export class Graphic<T = any> {
   }
 
   updateTextContent() {
-    if (this.name && !this.text) {
+    if (!this.text) {
       return this.renderText()
     }
     this.text.set({
