@@ -1,9 +1,11 @@
 import {fabric} from 'fabric'
 import {Sketchpad} from './Sketchpad'
-import {GraphicDrawerConfig, SketchConfig} from './type/drawer'
-import {Graphic} from './Graphic'
+import {GraphicDrawerConfig} from './type/drawer'
+import {Graphic, GraphicCfg} from './Graphic'
+import {PolygonGraph} from './PolygonGraph'
+import {LineGraph} from './LineGraph'
 
-export type DrawType = 'polygon' | 'rectangle' | 'circle'
+export type DrawType = 'polygon' | 'rectangle' | 'circle' | 'line'
 
 export interface DataType<T = any> {
   drawType: DrawType
@@ -59,7 +61,9 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
   setConfig(config: GraphicDrawerConfig) {
     super.setConfig(config)
   }
-
+  setDrawType(drawType: DrawType) {
+    this.drawType = drawType
+  }
   cleanGraphics() {
     this.graphicMap.forEach((g) => {
       g.destroy()
@@ -72,21 +76,35 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
     }
     return fill
   }
+  private getGraphicCfg(g: DataType<GDATA>['graphics'][number], width: number, height: number, group: string): GraphicCfg {
+    return {
+      id: g.id,
+      name: g.name,
+      closed: true,
+      fill: this.getFill(),
+      group,
+      dots: g.path.map(p => ({
+        x: p.x * width,
+        y: p.y * height
+      }))
+    }
+  }
   addData(data: DataType<GDATA>) {
     const width = this.canvas.getWidth()
     const height = this.canvas.getHeight()
     data.graphics.forEach(g => {
-      const graph = new Graphic<GDATA>(this, {
-        id: g.id,
-        name: g.name,
-        closed: true,
-        fill: this.getFill(),
-        group: data.group,
-        dots: g.path.map(p => ({
-          x: p.x * width,
-          y: p.y * height
-        }))
-      })
+      const cfg = this.getGraphicCfg(g, width, height, data.group)
+      let graph: Graphic
+      switch (data.drawType) {
+        case 'polygon':
+          graph = new PolygonGraph(this, cfg)
+          break
+        case 'line':
+          graph = new LineGraph(this, cfg)
+          break
+        default:
+          throw new Error(`不支持的绘图类型:${data.drawType}`)
+      }
       graph.data = g.data
       this.graphicMap.set(g.id, graph)
     })
@@ -123,6 +141,12 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
     switch (this.drawType) {
       case 'polygon':
         this.polygonMouseDown(e)
+        break
+      case 'line':
+        this.lineMouseDown(e)
+        break
+      default:
+        throw new Error(`不支持的绘图类型:${this.drawType}`)
     }
   }
 
@@ -154,12 +178,33 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
       if (this.currentGraphic) {
         this.currentGraphic.blur()
       }
-      this.currentGraphic = new Graphic<GDATA>(this, {
+      this.currentGraphic = new PolygonGraph<GDATA>(this, {
         fill: this.getFill()
       })
       this.graphicMap.set(this.currentGraphic.id, this.currentGraphic)
       this.currentGraphic.makeStartDot(this.canvas.getPointer(e.e))
     // 点到了graph上
+    } else if (e.target.data?._graphic){
+      const graphic = e.target.data._graphic as Graphic
+      if(
+        !this.currentGraphic
+        || (this.currentGraphic.closed && graphic !== this.currentGraphic)
+      ) {
+        this.config.editable && this.focus(graphic)
+      }
+    }
+  }
+
+  private lineMouseDown(e: fabric.IEvent<MouseEvent>) {
+    // 点到了空白区域
+    if(!e.target) {
+      if (this.currentGraphic) {
+        this.currentGraphic.blur()
+      }
+      this.currentGraphic = new LineGraph<GDATA>(this, {})
+      this.graphicMap.set(this.currentGraphic.id, this.currentGraphic)
+      this.currentGraphic.makeStartDot(this.canvas.getPointer(e.e))
+      // 点到了graph上
     } else if (e.target.data?._graphic){
       const graphic = e.target.data._graphic as Graphic
       if(

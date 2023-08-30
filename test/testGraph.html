@@ -34,6 +34,8 @@
 <button style="margin-top: 30px" onclick="saveCanvas()">保存</button>
 <button style="margin-top: 30px" onClick="toggleEditable()">可拖动/不可拖动</button>
 <button style="margin-top: 30px" onClick="toggleRecover()">恢复</button>
+<button style="margin-top: 30px" onClick="setDrawType('line')">画线</button>
+<button style="margin-top: 30px" onClick="setDrawType('polygon')">画多边形</button>
 <div>
   颜色 <input id="color">
   <button onclick="setLineColor()">保存颜色</button>
@@ -73,6 +75,14 @@
       }]
     }
   )
+  drawer.addData({
+    drawType: 'line',
+    graphics: [{
+      id: '3',
+      name: 'hello',
+      path: [{x: 0.6, y: 0.4}, {x: 0.8, y: 0.3}, {x: 0.7, y: 0.8}]
+    }]
+  })
   drawer.on('graph.click', e => console.log(e))
 
   function toggleEditable() {
@@ -80,8 +90,13 @@
       editable: !drawer.config.editable
     })
   }
+
   function toggleRecover() {
     drawer.recover()
+  }
+
+  function setDrawType(type) {
+    drawer.setDrawType(type)
   }
 </script>
 

@@ -176,39 +176,35 @@ export abstract class Sketchpad extends EventEmitter {
   getCanvasInfo() {
     return this.canvas.toJSON()
   }
-  makeSvgCurvePath(...points: [number, number][]) {
+  makeSvgCurvePath(points: fabric.IPoint[], arrow = false) {
     const len = points.length
     if (len < 2) return ''
 
-    const endP = points[len - 1]
-    const endP2 = points[len - 2]
-    const angle = Math.PI / 6
-    const {arrowRadius} = this.config
-    const yDiff = endP2[1] - endP[1]
-    const xDiff = endP[0] - endP2[0]
-    const slope = Math.atan(yDiff / xDiff)
+    let path: (string|number)[][] = fabric.util
+      // @ts-ignore
+      .getSmoothPathFromPoints(
+        points.map(p => new fabric.Point(p.x, p.y))
+      )
 
-    const fix = xDiff < 0 ? -1 : 1
-
-    const x1 = endP[0] - Math.cos(slope + angle) * arrowRadius * fix
-    const y1 = endP[1] + Math.sin(slope + angle) * arrowRadius * fix
-    const x2 = endP[0] - Math.cos(slope - angle) * arrowRadius * fix
-    const y2 = endP[1] + Math.sin(slope - angle) * arrowRadius * fix
-
-    const arrowPath = [['M', x1, y1], ['L', ...endP], ['L', x2, y2], ['L', x1, y1], ['L', ...endP]]
-
-    if (len === 2)
-      return [['M', ...points[0]], ['L', ...points[1]], ...arrowPath]
-        .map(item => item.join(',')).join('')
-
-    let path = [['M', ...points[0]]]
-    for (let i = 1; i < len - 1; i++) {
-      let x = (points[i][0] + points[i + 1][0]) / 2
-      let y = (points[i][1] + points[i + 1][1]) / 2
-      path.push(['Q', ...points[i], x, y])
+    if (arrow) {
+      const arrowPath = this.makeArrowPath(points[len - 1], points[len - 2])
+      path = path.concat(arrowPath)
     }
-    path.push(['T', ...endP], ...arrowPath)
-    return path.map(item => item.join(',')).join('')
+
+    return path.map(item => item.join(' ')).join(' ')
+  }
+  makeArrowPath(lastDot: fabric.IPoint, preLastDot: fabric.IPoint) {
+    const {arrowRadius} = this.config
+    const angle = Math.PI / 6
+    const yDiff = preLastDot.y - lastDot.y
+    const xDiff = lastDot.x - preLastDot.x
+    const slope = Math.atan(yDiff / xDiff)
+    const fix = xDiff < 0 ? -1 : 1
+    const x1 = lastDot.x - Math.cos(slope + angle) * arrowRadius * fix
+    const y1 = lastDot.y + Math.sin(slope + angle) * arrowRadius * fix
+    const x2 = lastDot.x - Math.cos(slope - angle) * arrowRadius * fix
+    const y2 = lastDot.y + Math.sin(slope - angle) * arrowRadius * fix
+    return [['M', x1, y1], ['L', lastDot.x, lastDot.y], ['L', x2, y2], ['L', x1, y1], ['L', lastDot.x, lastDot.y]]
   }
   makeCtlDot(pointer: fabric.IPoint) {
     const dot = new fabric.Circle({

@@ -3,7 +3,7 @@ import {SketchConfig} from '../type/drawer'
 export const defCfg: SketchConfig = {
   strokeWidth: 1,
   lineStroke: '#000',
-  arrowRadius: 6,
+  arrowRadius: 8,
   editable: false,
   formatter: () => '',
   hasShadow: false,

@@ -1,24 +1,15 @@
 import {fabric} from 'fabric'
-import tinyColor from 'tinycolor2'
 import {DrawType, GraphicDrawer} from './GraphicDrawer'
 import {Sketchpad} from './Sketchpad'
 
-type GraphicCfg = {
+export type GraphicCfg = {
   id?: string
   name?: string
   closed?: boolean
   fill?: string
+  stroke?: string
   group?: string
   dots?: fabric.IPoint[]
-}
-
-const drawingCfg: fabric.IPathOptions = {
-  stroke: 'rgba(0, 0, 0, 0.75)',
-  strokeWidth: 1,
-  fill: 'rgba(255, 255, 255, 0.75)',
-  hasBorders: false,
-  hasControls: false,
-  hoverCursor: 'crosshair'
 }
 
 const closedCfg: fabric.IPathOptions = {
@@ -44,17 +35,17 @@ const timeoutFn = (function useTimeout() {
 })()
 
 
-export class Graphic<T = any> {
+export abstract class Graphic<T = any> {
   id: string
-  private __name: string
+  protected __name: string
   fill: string
   group: string
   closed: boolean = false
-  private active: boolean = false
-  private selected = false
+  protected active: boolean = false
+  protected selected = false
+  protected movePointer: fabric.IPoint
   graph: fabric.Group
   path: fabric.Path
-  movePointer: fabric.IPoint
   readonly type: DrawType
   dots: fabric.IPoint[] = []
   vertexes: fabric.Object[] = []
@@ -70,7 +61,7 @@ export class Graphic<T = any> {
     this.__name = name
     this.updateTextContent()
   }
-  constructor(
+  protected constructor(
     public ctx: GraphicDrawer,
     public cfg: GraphicCfg = {}
   ) {
@@ -82,19 +73,8 @@ export class Graphic<T = any> {
     this.fill = cfg.fill ?? closedCfg.fill as string
     this.group = cfg.group ?? 'default'
     this.bindMethods()
-    if (cfg.closed) {
-      this.addClosedListeners()
-    } else {
-      this.addDrawingListeners()
-    }
-    if (cfg.dots?.length) {
-      this.dots = cfg.dots
-      this.renderPath()
-      this.renderText()
-    }
-    this.updateState()
   }
-  private bindMethods() {
+  protected bindMethods() {
     this.rightClick = this.rightClick.bind(this)
     this.close = this.close.bind(this)
     this.addDot = this.addDot.bind(this)
@@ -111,7 +91,7 @@ export class Graphic<T = any> {
     this.toggleVisible(false)
   }
 
-  private toggleVisible(visible: boolean) {
+  protected toggleVisible(visible: boolean) {
     this.path.set({visible})
     this.text?.set({visible})
     if (this.ctx.config.editable) {
@@ -151,26 +131,9 @@ export class Graphic<T = any> {
     if (this.isSameDot(point, this.dots[this.dots.length - 1])) return
     this.dots.push(point)
   }
-  close() {
-    if (this.closed) return
-    this.closed = true
-    this.pushDot(this.movePointer)
-    if (this.dots.length <= 2) {
-      return this.destroy()
-    }
-    this.active = true
-    this.removeDrawingListeners()
-    this.movePointer = null
-    this.renderPath()
-    this.addClosedListeners()
-    this.renderVertexes()
-    this.ctx.emit('graph.create', {
-      target: this,
-      data: {id: this.id, name: this.name}
-    })
-  }
+  abstract close(): void
 
-  private renderVertexes() {
+  protected renderVertexes() {
     if (this.vertexes.length) {
       this.ctx.rmFCvs(...this.vertexes)
       this.vertexes.forEach(vtx => {
@@ -237,7 +200,6 @@ export class Graphic<T = any> {
     this.ctx.canvas.on('mouse:move', this.onMove)
     window.addEventListener('keydown', this.onKeydown)
   }
-
   removeDrawingListeners() {
     this.ctx.canvas.off('mouse:down', this.addDot)
     this.ctx.canvas.off('mouse:move', this.onMove)
@@ -252,21 +214,8 @@ export class Graphic<T = any> {
   removeClosedListeners() {
     this.ctx.canvas.off('object:moving', this.onObjectMoving)
   }
-  private brighten() {
-    const fill = tinyColor(this.fill).darken().toString()
-    const shadow = new fabric.Shadow({
-      color: this.fill,
-      blur: 6,
-      offsetX: 0,
-      offsetY: 0,
-    })
-    this.path.set({fill, shadow})
-  }
-  private recoverFill() {
-    this.path.set({fill: this.fill, shadow: null})
-  }
+  abstract brighten(): void
   unselect() {
-    this.recoverFill()
     this.selected = false
   }
   select() {
@@ -295,23 +244,7 @@ export class Graphic<T = any> {
       this.active = false
     }
   }
-  renderPath() {
-    if (this.path) {
-      this.path.off('mousedown', this.onPathMouseDown)
-      this.ctx.rmFCvs(this.path)
-    }
-    const dots = this.closed ? this.dots : [...this.dots, this.movePointer]
-    const cfg = this.closed
-      ? {...closedCfg, fill: this.fill}
-      : drawingCfg
-    const pathStr = this.ctx.getPathStr(dots)
-    this.path = new fabric.Path(pathStr, cfg)
-    this.path.name = this.pathName
-    this.path.data = {x: this.path.left, y: this.path.top, _graphic: this}
-    this.path.on('mousedown', this.onPathMouseDown)
-    this.ctx.add2Cvs(this.path)
-    this.bringPathToFront()
-  }
+  abstract renderPath():void
 
   renderText() {
     const {textStyle} = this.ctx.config
@@ -345,7 +278,7 @@ export class Graphic<T = any> {
     })
   }
 
-  private bringPathToFront() {
+  protected bringPathToFront() {
     let index = this.ctx.canvas.getObjects().length - this.vertexes.length - 1
     this.path.moveTo(index)
     if (this.text?.visible) {
