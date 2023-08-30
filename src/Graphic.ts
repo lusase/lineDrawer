@@ -41,6 +41,7 @@ export abstract class Graphic<T = any> {
   fill: string
   group: string
   closed: boolean = false
+  evented = true
   protected active: boolean = false
   protected selected = false
   protected movePointer: fabric.IPoint
@@ -244,8 +245,25 @@ export abstract class Graphic<T = any> {
       this.active = false
     }
   }
-  abstract renderPath():void
 
+  renderPath() {
+    if (this.path) {
+      this.path.off('mousedown', this.onPathMouseDown)
+      this.ctx.rmFCvs(this.path)
+    }
+    const cfg = this.getPathCfg()
+    cfg.evented = this.evented
+    const pathStr = this.getPathStr()
+    this.path = new fabric.Path(pathStr, cfg)
+    this.path.name = this.pathName
+    this.path.data = {x: this.path.left, y: this.path.top, _graphic: this}
+    this.path.on('mousedown', this.onPathMouseDown)
+    this.ctx.add2Cvs(this.path)
+    this.bringPathToFront()
+  }
+
+  abstract getPathCfg(): fabric.IPathOptions
+  abstract getPathStr(): string
   renderText() {
     const {textStyle} = this.ctx.config
     if (!textStyle.visible || !this.name || !this.path) return

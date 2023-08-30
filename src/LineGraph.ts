@@ -2,6 +2,7 @@ import {Graphic, GraphicCfg} from './Graphic'
 import {GraphicDrawer} from './GraphicDrawer'
 import {fabric} from 'fabric'
 import tinyColor from 'tinycolor2'
+import {IPathOptions} from 'fabric/fabric-impl'
 const drawingCfg: fabric.IPathOptions = {
   stroke: 'rgba(0, 0, 0, 0.75)',
   strokeWidth: 2,
@@ -75,24 +76,15 @@ export class LineGraph<T = any> extends Graphic {
     super.unselect()
   }
 
-  renderPath() {
-    if (this.path) {
-      this.path.off('mousedown', this.onPathMouseDown)
-      this.ctx.rmFCvs(this.path)
-    }
-    const dots = this.closed ? this.dots : [...this.dots, this.movePointer]
-    const cfg = this.closed
-      ? closedCfg
+  getPathCfg() {
+    return this.closed
+      ? {...closedCfg, stroke: this.stroke}
       : drawingCfg
-    const pathSvgStr = this.ctx.makeSvgCurvePath(dots, this.closed)
-    this.path = new fabric.Path(pathSvgStr, cfg)
-    this.path.name = this.pathName
-    this.path.data = {x: this.path.left, y: this.path.top, _graphic: this}
-    this.path.on('mousedown', this.onPathMouseDown)
-    this.ctx.add2Cvs(this.path)
-    this.bringPathToFront()
   }
-
+  getPathStr() {
+    const dots = this.closed ? this.dots : [...this.dots, this.movePointer]
+    return this.ctx.makeSvgCurvePath(dots, this.closed)
+  }
   private recoverStroke() {
     this.path.set({stroke: this.stroke, shadow: null})
   }

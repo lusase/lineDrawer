@@ -69,28 +69,21 @@ export class PolygonGraph<T = any> extends Graphic{
     })
     this.path.set({fill, shadow})
   }
+  getPathCfg() {
+    return this.closed
+      ? {...closedCfg, fill: this.fill}
+      : drawingCfg
+  }
+  getPathStr() {
+    const dots = this.closed ? this.dots : [...this.dots, this.movePointer]
+    return this.ctx.getPathStr(dots)
+  }
+
   private recoverFill() {
     this.path.set({fill: this.fill, shadow: null})
   }
   unselect() {
     this.recoverFill()
     super.unselect()
-  }
-  renderPath() {
-    if (this.path) {
-      this.path.off('mousedown', this.onPathMouseDown)
-      this.ctx.rmFCvs(this.path)
-    }
-    const dots = this.closed ? this.dots : [...this.dots, this.movePointer]
-    const cfg = this.closed
-      ? {...closedCfg, fill: this.fill}
-      : drawingCfg
-    const pathStr = this.ctx.getPathStr(dots)
-    this.path = new fabric.Path(pathStr, cfg)
-    this.path.name = this.pathName
-    this.path.data = {x: this.path.left, y: this.path.top, _graphic: this}
-    this.path.on('mousedown', this.onPathMouseDown)
-    this.ctx.add2Cvs(this.path)
-    this.bringPathToFront()
   }
 }

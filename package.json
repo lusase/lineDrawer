@@ -1,7 +1,7 @@
 {
   "name": "linedrawer",
-  "version": "0.4.37",
-  "description": "lineDrawer base on fabric.js ",
+  "version": "0.5.1",
+  "description": "A Graphic Drawing Tool Based on Fabric.js ",
   "main": "index.js",
   "type": "module",
   "module": "dist/linedrawer.esm.js",
@@ -19,7 +19,9 @@
   "keywords": [
     "lineDrawer",
     "arrow",
-    "flow"
+    "flow direction",
+    "polygon",
+    "arrowhead curve"
   ],
   "author": "qtxz2000 <atpick@163.com>",
   "license": "MIT",
