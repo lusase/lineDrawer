@@ -9,6 +9,8 @@ export type GraphicCfg = {
   fill?: string
   stroke?: string
   group?: string
+  evented?: boolean
+  nameVisible?: boolean
   dots?: fabric.IPoint[]
 }
 
@@ -41,7 +43,7 @@ export abstract class Graphic<T = any> {
   fill: string
   group: string
   closed: boolean = false
-  evented = true
+  evented: boolean
   protected active: boolean = false
   protected selected = false
   protected movePointer: fabric.IPoint
@@ -53,6 +55,7 @@ export abstract class Graphic<T = any> {
   vertexName: string
   pathName: string
   text: fabric.Text
+  nameVisible: boolean
   // 用作携带数据
   data?: T
   get name() {
@@ -69,6 +72,8 @@ export abstract class Graphic<T = any> {
     this.id = cfg.id || Sketchpad.uuid()
     this.name = cfg.name
     this.closed = cfg.closed ?? false
+    this.evented = cfg.evented ?? true
+    this.nameVisible = cfg.nameVisible
     this.vertexName = 'vertex' + this.id
     this.pathName = 'path' + this.id
     this.fill = cfg.fill ?? closedCfg.fill as string
@@ -266,7 +271,8 @@ export abstract class Graphic<T = any> {
   abstract getPathStr(): string
   renderText() {
     const {textStyle} = this.ctx.config
-    if (!textStyle.visible || !this.name || !this.path) return
+    const showName = this.nameVisible ?? (textStyle.visible && !!this.name && !!this.path)
+    if (!showName) return
     const center = this.path.getCenterPoint()
     this.text = new fabric.Text(this.name, {
       ...textCfg,

@@ -14,6 +14,7 @@ export interface DataType<T = any> {
     id: string
     name: string
     evented?: boolean
+    nameVisible?: boolean
     data?: T
     path: {x: number, y: number}[]
   }[]
@@ -82,6 +83,8 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
       id: g.id,
       name: g.name,
       closed: true,
+      evented: g.evented,
+      nameVisible: g.nameVisible,
       fill: this.getFill(),
       group,
       dots: g.path.map(p => ({
@@ -107,7 +110,6 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
           throw new Error(`不支持的绘图类型:${data.drawType}`)
       }
       graph.data = g.data
-      graph.evented = g.evented
       this.graphicMap.set(g.id, graph)
     })
   }
