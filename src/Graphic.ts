@@ -265,11 +265,12 @@ export abstract class Graphic<T = any> {
     const showName = this.nameVisible ?? (textStyle.visible && !!this.name && !!this.path)
     if (!showName) return
     const center = this.path.getCenterPoint()
+    textStyle.visible = this.nameVisible ?? textStyle.visible
     this.text = new fabric.Text(this.name, {
       ...textCfg,
       left: center.x,
       top: center.y,
-      ...textStyle
+      ...textStyle,
     })
     this.ctx.add2Cvs(this.text)
   }
