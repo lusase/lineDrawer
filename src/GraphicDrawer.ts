@@ -124,6 +124,8 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
     const width = this.canvas.getWidth()
     const height = this.canvas.getHeight()
     data.graphics.forEach(g => {
+      g.x *= width
+      g.y *= height
       const graphic = new StaticGraph(this, g)
       this.staticGraphicMap.set(g.id, graphic)
     })

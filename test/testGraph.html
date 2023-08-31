@@ -86,6 +86,19 @@
       path: [{x: 0.6, y: 0.4}, {x: 0.8, y: 0.3}, {x: 0.7, y: 0.8}]
     }]
   })
+  drawer.addStaticData({
+    group: 'image',
+    graphics: [{
+      id: '5',
+      type: 'image',
+      bg: './icon.png',
+      name: '1',
+      width: 50,
+      height: 50,
+      x: 0.5,
+      y: 0.5
+    }]
+  })
   drawer.on('graph.click', e => console.log(e))
 
   function toggleEditable() {
@@ -112,7 +125,7 @@
   // })
   // drawer.canvas.add(rect)
 
-  console.log(map, k)
+  // console.log(map, k)
 
 </script>
 
