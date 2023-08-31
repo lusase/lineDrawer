@@ -290,8 +290,8 @@ export class LineDrawer extends Sketchpad {
     if (!isEditable && this.config.hasShadow) {
       pathConfig.shadow = this.pathShadow
     }
-    const coords: [number, number][] = line.lineDots.map(dot => ([dot.left, dot.top]))
-    const svgPath = this.makeSvgCurvePath(...coords)
+    const coords = line.lineDots.map(dot => ({x: dot.left, y: dot.top}))
+    const svgPath = this.makeSvgCurvePath(coords, true)
 
     if (line.path) {
       Object.assign(pathConfig, {

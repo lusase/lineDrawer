@@ -13,9 +13,18 @@ export interface SketchConfig {
   scalable?: boolean
   ctlSize?: number
   textStyle?: {
-    show?: boolean
-    color?: string
-    fontSize?: number
+    visible?: boolean
+    fontSize?: number | undefined
+    fontWeight?: string | number | undefined
+    fontFamily?: string | undefined
+    textAlign?: string | undefined
+    fontStyle?: '' | 'normal' | 'italic' | 'oblique' | undefined
+    textBackgroundColor?: string | undefined
+    stroke?: string | undefined
+    shadow?: fabric.Shadow | string | undefined
+    charSpacing?: number | undefined
+    strokeWidth?: number
+    fill?: string
   }
 }
 

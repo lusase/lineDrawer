@@ -3,7 +3,7 @@ import {SketchConfig} from '../type/drawer'
 export const defCfg: SketchConfig = {
   strokeWidth: 1,
   lineStroke: '#000',
-  arrowRadius: 6,
+  arrowRadius: 8,
   editable: false,
   formatter: () => '',
   hasShadow: false,
@@ -13,9 +13,9 @@ export const defCfg: SketchConfig = {
   scalable: true,
   ctlSize: 6,
   textStyle: {
-    show: false,
+    visible: false,
     fontSize: 12,
-    color: '#ccc'
+    stroke: '#ccc'
   }
 }
 
