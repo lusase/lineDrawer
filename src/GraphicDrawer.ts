@@ -1,9 +1,10 @@
 import {fabric} from 'fabric'
 import {Sketchpad} from './Sketchpad'
 import {GraphicDrawerConfig} from './type/drawer'
-import {Graphic, GraphicCfg} from './Graphic'
-import {PolygonGraph} from './PolygonGraph'
-import {LineGraph} from './LineGraph'
+import {Graphic, GraphicCfg} from './graphs/Graphic'
+import {PolygonGraph} from './graphs/PolygonGraph'
+import {LineGraph} from './graphs/LineGraph'
+import {StaticGraph, StaticGraphCfg} from './graphs/StaticGraph'
 
 export type DrawType = 'polygon' | 'rectangle' | 'circle' | 'line'
 
@@ -15,10 +16,16 @@ export interface DataType<T = any> {
   })[]
 }
 
+export interface StaticDataType {
+  group?: string
+  graphics: StaticGraphCfg[]
+}
+
 export class GraphicDrawer<GDATA = any> extends Sketchpad {
   drawType: DrawType = 'polygon'
   currentGraphic: Graphic<GDATA> = null
   graphicMap = new Map<string, Graphic<GDATA>>()
+  staticGraphicMap = new Map<string, StaticGraph>()
   constructor(canvasId: string | HTMLCanvasElement, config: GraphicDrawerConfig = {}) {
     super(canvasId, config)
   }
@@ -65,6 +72,9 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
     this.graphicMap.forEach((g) => {
       g.destroy()
     })
+    this.staticGraphicMap.forEach(g => {
+      g.destroy()
+    })
   }
   private getFill() {
     const {fills, fill} = this.config as GraphicDrawerConfig
@@ -109,6 +119,16 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
       this.graphicMap.set(g.id, graph)
     })
   }
+
+  addStaticData(data: StaticDataType) {
+    const width = this.canvas.getWidth()
+    const height = this.canvas.getHeight()
+    data.graphics.forEach(g => {
+      const graphic = new StaticGraph(this, g)
+      this.staticGraphicMap.set(g.id, graphic)
+    })
+  }
+
   getData() {
     const graphics = [...this.graphicMap.values()].map(graph => {
       return {

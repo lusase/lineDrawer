@@ -1,5 +1,5 @@
 import {Graphic, GraphicCfg} from './Graphic'
-import {GraphicDrawer} from './GraphicDrawer'
+import {GraphicDrawer} from '../GraphicDrawer'
 import {fabric} from 'fabric'
 import tinyColor from 'tinycolor2'
 import {IPathOptions} from 'fabric/fabric-impl'

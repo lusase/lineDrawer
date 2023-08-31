@@ -1,6 +1,6 @@
 import {fabric} from 'fabric'
-import {DrawType, GraphicDrawer} from './GraphicDrawer'
-import {Sketchpad} from './Sketchpad'
+import {DrawType, GraphicDrawer} from '../GraphicDrawer'
+import {Sketchpad} from '../Sketchpad'
 
 export type GraphicCfg = {
   id?: string
@@ -316,7 +316,7 @@ export abstract class Graphic<T = any> {
   }
 
   destroy() {
-    this.ctx.rmFCvs(this.path, ...this.vertexes)
+    this.ctx.rmFCvs(this.path, ...this.vertexes, this.text)
     this.removeClosedListeners()
     this.removeDrawingListeners()
     this.ctx.graphicMap.delete(this.id)

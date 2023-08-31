@@ -1,6 +1,6 @@
 import {fabric} from 'fabric'
 import tinyColor from 'tinycolor2'
-import {DrawType, GraphicDrawer} from './GraphicDrawer'
+import {DrawType, GraphicDrawer} from '../GraphicDrawer'
 import {Graphic, GraphicCfg} from './Graphic'
 
 
