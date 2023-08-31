@@ -11,7 +11,7 @@ export type GraphicCfg = {
   group?: string
   evented?: boolean
   nameVisible?: boolean
-  dots?: fabric.IPoint[]
+  path?: fabric.IPoint[]
 }
 
 const closedCfg: fabric.IPathOptions = {
@@ -27,15 +27,6 @@ const textCfg: fabric.TextOptions = {
   originX: 'center',
   originY: 'center'
 }
-
-const timeoutFn = (function useTimeout() {
-  let timer: string | number | NodeJS.Timeout
-  return (handler: () => void, ms?: number) => {
-    if (timer) clearTimeout(timer)
-    timer = setTimeout(handler, ms)
-  }
-})()
-
 
 export abstract class Graphic<T = any> {
   id: string

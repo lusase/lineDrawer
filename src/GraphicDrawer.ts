@@ -10,14 +10,9 @@ export type DrawType = 'polygon' | 'rectangle' | 'circle' | 'line'
 export interface DataType<T = any> {
   drawType: DrawType
   group?: string
-  graphics: {
-    id: string
-    name: string
-    evented?: boolean
-    nameVisible?: boolean
+  graphics: (GraphicCfg & {
     data?: T
-    path: {x: number, y: number}[]
-  }[]
+  })[]
 }
 
 export class GraphicDrawer<GDATA = any> extends Sketchpad {
@@ -85,9 +80,10 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
       closed: true,
       evented: g.evented,
       nameVisible: g.nameVisible,
-      fill: this.getFill(),
+      fill: g.fill || this.getFill(),
+      stroke: g.stroke,
       group,
-      dots: g.path.map(p => ({
+      path: g.path.map(p => ({
         x: p.x * width,
         y: p.y * height
       }))

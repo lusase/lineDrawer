@@ -33,8 +33,8 @@ export class PolygonGraph<T = any> extends Graphic{
     } else {
       this.addDrawingListeners()
     }
-    if (cfg.dots?.length) {
-      this.dots = cfg.dots
+    if (cfg.path?.length) {
+      this.dots = cfg.path
       this.renderPath()
       this.renderText()
     }
