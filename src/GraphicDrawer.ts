@@ -137,6 +137,7 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
         id: graph.id,
         name: graph.name,
         path: graph.getPath(),
+        group: graph.group,
         data: graph.data
       }
     })

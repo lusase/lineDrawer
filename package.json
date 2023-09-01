@@ -1,6 +1,6 @@
 {
   "name": "linedrawer",
-  "version": "0.5.5",
+  "version": "0.5.7",
   "description": "A Graphic Drawing Tool Based on Fabric.js ",
   "main": "index.js",
   "type": "module",
