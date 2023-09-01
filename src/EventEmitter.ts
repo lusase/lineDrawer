@@ -9,7 +9,7 @@ export class EventEmitter {
   constructor() {
     this._events = {}
   }
-  on(type: GEventName, handler: (e) => void): GraphicDrawer
+  on(type: GEventName, handler: Fn): GraphicDrawer
   on(type: string, handler: Fn): EventEmitter {
     if ('function' !== typeof handler) {
       throw new Error('method (on) only takes instances of Function')
@@ -27,16 +27,16 @@ export class EventEmitter {
     return this
   }
 
-  off(type: string, listener?: Fn): EventEmitter {
+  off(type: string, handler?: Fn): EventEmitter {
     if (!this._events[type]) return this
-    if (!listener) delete this._events[type]
+    if (!handler) delete this._events[type]
     const fn = this._events[type]
     if (Array.isArray(fn)) {
-      const index = fn.indexOf(listener)
+      const index = fn.indexOf(handler)
       if (index < 0) return this
       fn.splice(index, 1)
       if (fn.length === 0) delete this._events[type]
-    } else if (fn === listener) {
+    } else if (fn === handler) {
       delete this._events[type]
     }
     return this
