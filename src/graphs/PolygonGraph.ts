@@ -80,7 +80,7 @@ export class PolygonGraph<T = any> extends Graphic{
   }
 
   private recoverFill() {
-    this.path.set({fill: this.fill, shadow: null})
+    this.path?.set({fill: this.fill, shadow: null})
   }
   unselect() {
     this.recoverFill()
