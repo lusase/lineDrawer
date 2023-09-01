@@ -1,38 +1,42 @@
 import {GEventName, IGEvent, LEventName} from './type/drawer'
 import {GraphicDrawer} from './GraphicDrawer'
-import {fabric} from 'fabric'
+
+type Fn = (...args: any[]) => any
 
 export class EventEmitter {
-  _events: {
-    [propName: string]: ((...args: any[]) => any)[] | ((...args: any[]) => any)
-  }
+  _events: Record<string, Fn | Fn[]>
 
   constructor() {
     this._events = {}
   }
   on(type: GEventName, handler: (e) => void): GraphicDrawer
-  on(type: string, handler: (...args: any[]) => any): EventEmitter {
+  on(type: string, handler: Fn): EventEmitter {
     if ('function' !== typeof handler) {
       throw new Error('method (on) only takes instances of Function')
     }
-    if (!this._events[type]) {
+    const fn = this._events[type]
+    if (!fn) {
       this._events[type] = handler
     } else {
-      this._events[type] = [<(...args: any[]) => any>this._events[type], handler]
+      if (Array.isArray(fn)) {
+        fn.push(handler)
+      } else {
+        this._events[type] = [fn, handler]
+      }
     }
     return this
   }
 
-  off(type: string, listener?: (...args: any[]) => void): EventEmitter {
+  off(type: string, listener?: Fn): EventEmitter {
     if (!this._events[type]) return this
     if (!listener) delete this._events[type]
-    const list = this._events[type]
-    if (Array.isArray(list)) {
-      const index = list.indexOf(listener)
+    const fn = this._events[type]
+    if (Array.isArray(fn)) {
+      const index = fn.indexOf(listener)
       if (index < 0) return this
-      list.splice(index, 1)
-      if (list.length === 0) delete this._events[type]
-    } else if (list === listener) {
+      fn.splice(index, 1)
+      if (fn.length === 0) delete this._events[type]
+    } else if (fn === listener) {
       delete this._events[type]
     }
     return this
@@ -41,12 +45,12 @@ export class EventEmitter {
   emit(type: GEventName, e: IGEvent<any>): unknown
   emit(type: LEventName, e: object): unknown
   emit(type: string, e: unknown): unknown {
-    const handler = this._events[type]
-    if (!handler) return false
-    if (typeof handler === 'function') {
-      return handler.call(this, e)
-    } else if (Array.isArray(handler)) {
-      return handler.map(item => {
+    const fn = this._events[type]
+    if (!fn) return false
+    if (typeof fn === 'function') {
+      return fn.call(this, e)
+    } else if (Array.isArray(fn)) {
+      return fn.map(item => {
         if (typeof item === 'function') return item.call(this, e)
       })
     } else {
