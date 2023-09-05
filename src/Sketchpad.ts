@@ -1,7 +1,7 @@
 import {fabric} from 'fabric'
 import {EventEmitter} from './EventEmitter'
 import {SketchConfig} from './type/drawer'
-import {defCfg, merge} from './util'
+import {defCfg, merge, setStyle, tooltipDefStyle} from './util'
 
 
 export abstract class Sketchpad extends EventEmitter {
@@ -27,6 +27,7 @@ export abstract class Sketchpad extends EventEmitter {
     this.initBg()
     this.initHandlers()
     this.initListeners()
+    this.initTooltip()
   }
   abstract configSetHandler(target: any, p: string | symbol, newValue: any, receiver: any): boolean
   initBg() {
@@ -72,6 +73,12 @@ export abstract class Sketchpad extends EventEmitter {
     this.canvas.dispose()
   }
 
+  initTooltip() {
+    if (!this.config.alwaysShowTip) {
+      this.tooltip = this.createTipEl()
+    }
+  }
+
   removeTooltipEl() {
     const {wrapperEl} = this.canvas
     const tooltips = wrapperEl.getElementsByClassName('tooltip')
@@ -82,6 +89,7 @@ export abstract class Sketchpad extends EventEmitter {
     const {wrapperEl} = this.canvas
     const el = document.createElement('div')
     el.className = 'tooltip'
+    setStyle(el, tooltipDefStyle)
     wrapperEl.appendChild(el)
     return el
   }
@@ -156,6 +164,7 @@ export abstract class Sketchpad extends EventEmitter {
     this.canvas.zoomToPoint({x, y}, zoom)
     e.e.preventDefault()
     e.e.stopPropagation()
+    this.emit('canvas.scale', {target: this})
   }
 
   panHandler(e: fabric.IEvent<MouseEvent>) {
@@ -165,6 +174,7 @@ export abstract class Sketchpad extends EventEmitter {
       this.canvas.relativePan(
         new fabric.Point(moveX - startX, moveY - startY)
       )
+      this.emit('canvas.pan', {target: this})
     }
     let {x: startX, y: startY} = this.canvas.getPointer(e.e)
     this.canvas.on('mouse:move', moveFn)

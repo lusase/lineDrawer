@@ -6,47 +6,67 @@
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
+  <style>
+      * {
+          margin: 0;
+          padding: 0;
+      }
+
+      body {
+          background-color: #f0f0f0;
+      }
+      #app {
+          display: flex;
+          justify-content: center;
+          margin-top: 20px;
+      }
+      .ops {
+          margin-top: 20px;
+          padding: 10px;
+          text-align: center;
+      }
+      .canvas-box {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+      .canvas-container {
+          border: 2px dashed lime;
+      }
+  </style>
   <script src="https://cdn.bootcdn.net/ajax/libs/fabric.js/5.3.1/fabric.js"></script>
-  <script src="../node_modules/tinycolor2/tinycolor.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/tinycolor/1.6.0/tinycolor.js"></script>
 </head>
 <body>
-
-<div style="color: #fff">
-  <span style="background: aqua   ">aqua 水绿色</span>
-  <span style="background: fuchsia">fuchsia 紫红色</span>
-  <span style="background: lime   ">lime 黄绿色</span>
-  <span style="background: maroon ">maroon 红褐色</span>
-  <span style="background: navy   ">navy 藏青色</span>
-  <span style="background: olive  ">olive 黄褐色</span>
-  <span style="background: silver ">silver 银色</span>
-  <span style="background: teal   ">teal 蓝绿色</span>
-  <span style="background: purple ">purple 紫色</span>
-  <span style="background: orange ">orange 橘黄色</span>
-</div>
-<div style="margin: 20px;width: 1920px;height: 480px;background: #ccc;display: flex;">
-  <canvas id="c" width="640" height="480"></canvas>
-  <canvas id="d" width="640" height="480" style="margin-left: 80px;"></canvas>
-</div>
-
-<button style="margin-top: 30px" onclick="addNewLine()">新建线条</button>
-<button style="margin-top: 30px" onclick="delCurrentDot()">删除选中的点</button>
-<button style="margin-top: 30px" onclick="delCurrentLine()">删除选中的线条</button>
-<button style="margin-top: 30px" onclick="saveCanvas()">保存</button>
-<button style="margin-top: 30px" onClick="toggleEditable()">可拖动/不可拖动</button>
-<button style="margin-top: 30px" onClick="toggleRecover()">恢复</button>
-<button style="margin-top: 30px" onClick="setDrawType('line')">画线</button>
-<button style="margin-top: 30px" onClick="setDrawType('polygon')">画多边形</button>
-<div>
-  颜色 <input id="color">
-  <button onclick="setLineColor()">保存颜色</button>
-</div>
-<div>
-  宽度 <input id="width">
-  <button onclick="setLineWidth()">保存宽度</button>
+<div id="app">
+  <div class="ops">
+    <div>状态</div>
+    <label onClick="toggleEditable(true)">
+      <input name="editable" type="radio" checked>
+      编辑
+    </label>
+    <label onClick="toggleEditable(false)">
+      <input name="editable" type="radio">
+      只读
+    </label>
+    <br>
+    <br>
+    <div>绘图类型</div>
+    <label onClick="setDrawType('polygon')">
+      <input name="drawType" type="radio" checked>
+      画多边形
+    </label>
+    <label onClick="setDrawType('line')">
+      <input name="drawType" type="radio">
+      画线
+    </label>
+  </div>
+  <div class="canvas-box">
+    <canvas id="c" width="1280" height="720"></canvas>
+  </div>
 </div>
 <script>
   fabric.fabric = fabric
-  // window.w$1 = tinycolor
 </script>
 <script src="../dist/linedrawer.js"></script>
 <script>
@@ -54,14 +74,18 @@
   const drawer = new LineDrawer.GraphicDrawer('c', {
     lineStroke: '#fff',
     strokeWidth: 2,
-    editable: true,
+    editable: false,
     pathOpacity: 0.5,
-    bgUrl: './bg.jpg',
+    bgUrl: './ai.png',
     fill: '#1890ff',
     fills: ['red', 'blue', 'yellow'],
     textStyle: {
       visible: true
-    }
+    },
+    formatter(target) {
+      return target.data?._graphic.name || target.name
+    },
+    alwaysShowTip: true
   })
   drawer.addData(
     {
@@ -74,7 +98,7 @@
       }, {
         id: '2',
         name: '名字特别的长, 躲到树后面也会被发现',
-        path: [{x: 0.2, y: 0.1}, {x: 0.3, y: 0.2}, {x: 0.5, y: 0.1}]
+        path: [{x: 0.3, y: 0.1}, {x: 0.2, y: 0.3}, {x: 0.5, y: 0.4}, {x: 0.4, y: 0.15}]
       }]
     }
   )
@@ -82,8 +106,17 @@
     drawType: 'line',
     graphics: [{
       id: '3',
-      name: 'hello',
-      path: [{x: 0.6, y: 0.4}, {x: 0.8, y: 0.3}, {x: 0.7, y: 0.8}]
+      name: '曲线一号<br>平滑曲线',
+      nameVisible: false,
+      strokeWidth: 20,
+      path: [{x: 0.7, y: 0.2}, {x: 0.6, y: 0.4}, {x: 0.8, y: 0.3}, {x: 0.7, y: 0.7}]
+    }, {
+      id: '4',
+      name: 'good line',
+      nameVisible: false,
+      stroke: 'rgba(0, 250, 255, 0.6)',
+      strokeWidth: 10,
+      path: [{x: 0.5, y: 0.2}, {x: 0.5, y: 0.4}, {x: 0.6, y: 0.3}, {x: 0.6, y: 0.6}].reverse()
     }]
   })
   drawer.addStaticData({
@@ -101,56 +134,15 @@
   })
   drawer.on('graph.click', e => console.log(e))
 
-  function toggleEditable() {
+  function toggleEditable(editable) {
     drawer.setConfig({
-      editable: !drawer.config.editable
+      editable
     })
-  }
-
-  function toggleRecover() {
-    drawer.recover()
   }
 
   function setDrawType(type) {
     drawer.setDrawType(type)
   }
-  // const rect = new fabric.Rect({
-  //   left: 320,
-  //   top: 240,
-  //   width: 100,
-  //   height: 100,
-  //   originY: 'center',
-  //   originX: 'center',
-  //   fill: '#000'
-  // })
-  // drawer.canvas.add(rect)
-
-  // console.log(map, k)
-
-</script>
-
-<script>
-  /*const canvas = new fabric.Canvas('d')
-  const rect = new fabric.Rect({
-    left: 100,
-    top: 100,
-    width: 100,
-    height: 100,
-    fill: 'red',
-  })
-  const rect2 = new fabric.Rect({
-    left: 150,
-    top: 150,
-    width: 100,
-    height: 100,
-    fill: 'blue'
-  })
-  canvas.add(rect, rect2)
-  console.log(canvas)
-  setTimeout(() => {
-    rect2.sendToBack()
-    rect2.set({selected: false})
-  }, 5000)*/
 </script>
 </body>
 </html>

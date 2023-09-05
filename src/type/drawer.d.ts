@@ -64,6 +64,8 @@ export type GEventName =
   | 'graph.delete'
   | 'graph.click'
   | 'graph.beforeDel'
+  | 'canvas.pan'
+  | 'canvas.scale'
 export type LEventName =
   'add.line'
   | 'add.dot'

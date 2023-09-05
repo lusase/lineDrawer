@@ -5,6 +5,7 @@ import {Graphic, GraphicCfg} from './graphs/Graphic'
 import {PolygonGraph} from './graphs/PolygonGraph'
 import {LineGraph} from './graphs/LineGraph'
 import {StaticGraph, StaticGraphCfg} from './graphs/StaticGraph'
+import {setStyle, tooltipDefStyle} from './util'
 
 export type DrawType = 'polygon' | 'rectangle' | 'circle' | 'line'
 
@@ -92,6 +93,7 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
       nameVisible: g.nameVisible,
       fill: g.fill || this.getFill(),
       stroke: g.stroke,
+      strokeWidth: g.strokeWidth,
       group,
       path: g.path.map(p => ({
         x: p.x * width,
@@ -174,9 +176,26 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
   }
 
   onMouseMove(e: fabric.IEvent<MouseEvent>): void {
+    if (this.config.editable || this.config.alwaysShowTip) return
+    if (this.config.formatter && this.tooltip && e.target) {
+      const html = this.config.formatter(e.target)
+      if (!html) return
+      const p = this.canvas.getPointer(e.e)
+      const tp = fabric.util.transformPoint(new fabric.Point(p.x, p.y), this.canvas.viewportTransform)
+      this.tooltip.innerHTML = html
+      setStyle(this.tooltip, {
+        visibility: 'visible',
+        left: tp.x + 14 + 'px',
+        top: tp.y + 14 + 'px'
+      })
+    }
   }
 
   onMouseOut(e: fabric.IEvent<MouseEvent>): void {
+    if (this.config.editable || this.config.alwaysShowTip) return
+    if (!this.isToolTipHidden()) {
+      setStyle(this.tooltip, {visibility: 'hidden'})
+    }
   }
 
   onMouseOver(e: fabric.IEvent<MouseEvent>): void {

@@ -3,8 +3,10 @@ import {GraphicDrawer} from '../GraphicDrawer'
 import {fabric} from 'fabric'
 import tinyColor from 'tinycolor2'
 import {IPathOptions} from 'fabric/fabric-impl'
+import {setStyle} from '../util'
+
 const drawingCfg: fabric.IPathOptions = {
-  stroke: 'rgba(0, 0, 0, 0.75)',
+  stroke: 'rgba(0, 0, 0, 0.45)',
   strokeWidth: 2,
   fill: 'transparent',
   hasBorders: false,
@@ -20,14 +22,18 @@ const closedCfg: fabric.IPathOptions = {
   hasControls: false,
   perPixelTargetFind: true
 }
+
 export class LineGraph<T = any> extends Graphic {
   stroke: string
+  strokeWidth: number
+
   constructor(
     public ctx: GraphicDrawer,
     public cfg: GraphicCfg = {}
   ) {
     super(ctx, cfg)
     this.stroke = cfg.stroke ?? closedCfg.stroke
+    this.strokeWidth = cfg.strokeWidth ?? closedCfg.strokeWidth
     if (cfg.closed) {
       this.addClosedListeners()
     } else {
@@ -39,6 +45,33 @@ export class LineGraph<T = any> extends Graphic {
       this.renderText()
     }
     this.updateState()
+    this.initTooltip()
+  }
+
+  protected initTooltip() {
+    if (this.ctx.config.editable) return
+    super.initTooltip()
+    if (!this.tooltip || !this.ctx.config.formatter) return
+    const html = this.ctx.config.formatter(this.path)
+    if (!html) return
+    this.tooltip.innerHTML = html
+    this.updateTooltipPos = this.updateTooltipPos.bind(this)
+    this.updateTooltipPos()
+    this.ctx.on('canvas.scale', this.updateTooltipPos)
+    this.ctx.on('canvas.pan', this.updateTooltipPos)
+  }
+
+  updateTooltipPos() {
+    const lastDot = this.dots[this.dots.length - 1]
+    const pos = fabric.util.transformPoint(
+      new fabric.Point(lastDot.x, lastDot.y),
+      this.ctx.canvas.viewportTransform
+    )
+    setStyle(this.tooltip, {
+      visibility: 'visible',
+      left: pos.x + 'px',
+      top: pos.y + 'px'
+    })
   }
 
   brighten() {
@@ -78,14 +111,25 @@ export class LineGraph<T = any> extends Graphic {
 
   getPathCfg() {
     return this.closed
-      ? {...closedCfg, stroke: this.stroke}
+      ? {
+        ...closedCfg,
+        stroke: this.stroke,
+        strokeWidth: this.strokeWidth
+      }
       : drawingCfg
   }
+
   getPathStr() {
     const dots = this.closed ? this.dots : [...this.dots, this.movePointer]
     return this.ctx.makeSvgCurvePath(dots, this.closed)
   }
+
   private recoverStroke() {
     this.path.set({stroke: this.stroke, shadow: null})
+  }
+  destroy() {
+    super.destroy()
+    this.ctx.off('canvas.scale', this.updateTooltipPos)
+    this.ctx.off('canvas.pan', this.updateTooltipPos)
   }
 }

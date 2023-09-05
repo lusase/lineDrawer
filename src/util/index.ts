@@ -45,3 +45,22 @@ export function merge<T extends object>(target: T, ...sources: object[]) {
 
   return merge(target, ...sources)
 }
+
+export function setStyle(ele: HTMLElement, styleObj: Partial<CSSStyleDeclaration>): void {
+  Object.keys(styleObj).forEach(e => {
+    ele.style[e] = styleObj[e]
+  })
+}
+
+export const tooltipDefStyle: Partial<CSSStyleDeclaration> = {
+  position: 'absolute',
+  visibility: 'hidden',
+  background: 'rgba(0, 0, 0, 0.5)',
+  color: '#fff',
+  padding: '4px 8px',
+  fontSize: '14px',
+  borderRadius: '4px',
+  pointerEvents: 'none',
+  transition: 'left 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0s, top 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0s',
+  boxShadow: 'rgba(0, 0, 0, 0.2) 1px 2px 10px'
+}

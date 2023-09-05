@@ -1,6 +1,7 @@
 import {fabric} from 'fabric'
 import {DrawType, GraphicDrawer} from '../GraphicDrawer'
 import {Sketchpad} from '../Sketchpad'
+import {setStyle} from '../util'
 
 export type GraphicCfg = {
   id?: string
@@ -8,6 +9,7 @@ export type GraphicCfg = {
   closed?: boolean
   fill?: string
   stroke?: string
+  strokeWidth?: number
   group?: string
   evented?: boolean
   nameVisible?: boolean
@@ -47,6 +49,7 @@ export abstract class Graphic<T = any> {
   pathName: string
   text: fabric.Text
   nameVisible: boolean
+  tooltip: HTMLElement
   // 用作携带数据
   data?: T
   get name() {
@@ -79,6 +82,11 @@ export abstract class Graphic<T = any> {
     this.onKeydown = this.onKeydown.bind(this)
     this.onObjectMoving = this.onObjectMoving.bind(this)
     this.onPathMouseDown = this.onPathMouseDown.bind(this)
+  }
+  protected initTooltip() {
+    if (this.closed && this.ctx.config.alwaysShowTip) {
+      this.tooltip = this.ctx.createTipEl()
+    }
   }
   show() {
     this.toggleVisible(true)
