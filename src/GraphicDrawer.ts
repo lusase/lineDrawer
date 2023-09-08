@@ -218,7 +218,11 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
     // 点到了空白区域
     if(!e.target) {
       if (this.currentGraphic) {
-        this.currentGraphic.blur()
+        if (this.currentGraphic.closed) {
+          this.currentGraphic.blur()
+        } else {
+          return
+        }
       }
       this.currentGraphic = new PolygonGraph<GDATA>(this, {
         fill: this.getFill()
