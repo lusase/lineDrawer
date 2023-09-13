@@ -42,11 +42,11 @@
   <div class="ops">
     <div>状态</div>
     <label onClick="toggleEditable(true)">
-      <input name="editable" type="radio" checked>
+      <input name="editable" type="radio">
       编辑
     </label>
     <label onClick="toggleEditable(false)">
-      <input name="editable" type="radio">
+      <input name="editable" type="radio" checked>
       只读
     </label>
     <br>
@@ -114,6 +114,7 @@
       id: '4',
       name: 'good line',
       nameVisible: false,
+      smooth: false,
       stroke: 'rgba(0, 250, 255, 0.6)',
       strokeWidth: 10,
       path: [{x: 0.5, y: 0.2}, {x: 0.5, y: 0.4}, {x: 0.6, y: 0.3}, {x: 0.6, y: 0.6}].reverse()

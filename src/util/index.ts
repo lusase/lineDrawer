@@ -4,6 +4,7 @@ export const defCfg: SketchConfig = {
   strokeWidth: 1,
   lineStroke: '#000',
   arrowRadius: 8,
+  arrowShow: true,
   editable: false,
   formatter: () => '',
   hasShadow: false,

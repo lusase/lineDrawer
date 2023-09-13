@@ -24,6 +24,7 @@ const closedCfg: fabric.IPathOptions = {
 }
 
 export class LineGraph<T = any> extends Graphic {
+  smooth: boolean
   stroke: string
   strokeWidth: number
 
@@ -34,6 +35,8 @@ export class LineGraph<T = any> extends Graphic {
     super(ctx, cfg)
     this.stroke = cfg.stroke ?? closedCfg.stroke
     this.strokeWidth = cfg.strokeWidth ?? closedCfg.strokeWidth
+    this.smooth = cfg.smooth ?? this.ctx.config.smooth ?? true
+
     if (cfg.closed) {
       this.addClosedListeners()
     } else {
@@ -121,7 +124,10 @@ export class LineGraph<T = any> extends Graphic {
 
   getPathStr() {
     const dots = this.closed ? this.dots : [...this.dots, this.movePointer]
-    return this.ctx.makeSvgCurvePath(dots, this.closed)
+    const arrowShow = this.ctx.config.arrowShow
+    return this.smooth
+      ? this.ctx.makeSvgCurvePath(dots, this.closed && arrowShow)
+      : this.ctx.getPathStr(dots, this.closed && arrowShow, true)
   }
 
   private recoverStroke() {
@@ -131,5 +137,9 @@ export class LineGraph<T = any> extends Graphic {
     super.destroy()
     this.ctx.off('canvas.scale', this.updateTooltipPos)
     this.ctx.off('canvas.pan', this.updateTooltipPos)
+    if (this.ctx.config.alwaysShowTip && this.tooltip) {
+      this.tooltip.remove()
+      this.tooltip = null
+    }
   }
 }

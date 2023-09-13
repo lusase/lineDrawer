@@ -3,7 +3,7 @@ import {DrawType, GraphicDrawer} from '../GraphicDrawer'
 import {Sketchpad} from '../Sketchpad'
 import {setStyle} from '../util'
 
-export type GraphicCfg = {
+export interface GraphicCfg {
   id?: string
   name?: string
   closed?: boolean
@@ -11,6 +11,7 @@ export type GraphicCfg = {
   stroke?: string
   strokeWidth?: number
   group?: string
+  smooth?: boolean
   evented?: boolean
   nameVisible?: boolean
   path?: fabric.IPoint[]

@@ -235,13 +235,18 @@ export abstract class Sketchpad extends EventEmitter {
     return dot
   }
 
-  getPathStr(dots: fabric.IPoint[]) {
+  getPathStr(dots: fabric.IPoint[], arrow = false, opened = false) {
     if (dots.length < 2) return ''
     const start = 'M '
-    const middle = dots.filter(Boolean).map(({x, y}) => {
-      return `${x},${y}`
+    dots = dots.filter(Boolean)
+    let middle = dots.map(({x, y}) => {
+      return `${x} ${y}`
     }).join('L')
-    const end = ' z'
+    if (arrow) {
+      const arrowPath = this.makeArrowPath(dots[dots.length - 1], dots[dots.length - 2])
+      middle += arrowPath.flat().join(' ')
+    }
+    const end = opened ? '' : ' z'
     return start + middle + end
   }
   add2Cvs(...objs: fabric.Object[]) {

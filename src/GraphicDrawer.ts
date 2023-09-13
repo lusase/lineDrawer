@@ -93,6 +93,7 @@ export class GraphicDrawer<GDATA = any> extends Sketchpad {
       nameVisible: g.nameVisible,
       fill: g.fill || this.getFill(),
       stroke: g.stroke,
+      smooth: g.smooth,
       strokeWidth: g.strokeWidth,
       group,
       path: g.path.map(p => ({

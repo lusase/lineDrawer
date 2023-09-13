@@ -4,6 +4,8 @@ export interface SketchConfig {
   strokeWidth?: number
   lineStroke?: string
   arrowRadius?: number
+  arrowShow?: boolean
+  smooth?: boolean
   editable?: boolean
   formatter?: (param: unknown) => string
   hasShadow?: boolean
